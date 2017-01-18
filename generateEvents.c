@@ -23,14 +23,14 @@ generate random events for: E=0.1-60.0 0.1
                             t=0.0-10.0 0.001
 */
 
-void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
-    /*read in trigger efficiency*/
+void fillTriggerEff(double *triggerEns, double *triggerEffs, bool useTriggerEff){
+    /*Read in trigger efficiency based on the chosen resolution (eff. vs. energy).
+     Note that the trigger efficiency file for the chosen resolution needs
+     to be located in the current directory.*/
     int i;
-    double triggerEnergy[RESE+1];
-    double triggerEfficiency[RESE+1];
     /* initialize with 1 in case triggerEfficiency is not used*/
-    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1.0);
-    if(triggEff){
+    for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+    if(useTriggerEff){
         FILE *myFile;
         if (RESE==600){
             myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
@@ -45,18 +45,35 @@ void createSpectrum(double *spectrum, double mass, double distance, double event
             printf("Invalid grid size for the energy resolution.");
         }
         for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
+            fscanf(myFile, "%lf %lf", &triggerEns[i], &triggerEffs[i]);
         }
         fclose(myFile);
     }
+}
 
-    /*create the spectrum from which the random events are drawn*/
-	generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
-    // add noise to the spectrum
+void addNoise(double *spectrum, double noise){
+    int i;
+    // add constant noise floor to the spectrum
     for (i=0; i<(RESE-1)*REST;i++){
         //spectrum[i] *= 0.99;
         spectrum[i] += noise;
     }
+}
+
+void createSpectrum(double *spectrum, double mass, double distance, double events, bool useEnergyRes, bool useTriggerEff, double noise){
+    int i;
+    double triggerEns[RESE+1];
+    double triggerEffs[RESE+1];
+
+    /*get trigger efficiencies as function of energy*/
+    fillTriggerEff(triggerEns, triggerEffs, useTriggerEff);
+
+    /*create the spectrum from which the random events are drawn*/
+    generateDist(mass, distance, events, spectrum, triggerEffs, useEnergyRes);
+
+    /*sprinkle with some noise*/
+    addNoise(spectrum, noise);
+
     /*double testsum = 0.0;
     for (i=0; i<(RESE-1)*REST;i++){
         testsum += spectrum[i]*(1/(REST*0.1))*(1/(RESE/60.0));
@@ -95,27 +112,26 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
     }
 
     fclose(f);
-    
 }
 
 int main(void){
-	/*set parameters*/
+    /*set parameters*/
     /*flag for trigger efficiency*/
-    bool triggEff = true;
-    bool energyRes = true;
+    bool useTriggerEff = true;
+    bool useEnergyRes = true;
     double mass = 1.0;
     double distance = 5.0;
     double events = 10.0;
     int filenumber, i;
     double noise = pow(10,-5);
-    
-    // generate spectrum from whicht time/energy events are drawn
-	double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
-    createSpectrum(spectrum, mass, distance, events, energyRes, triggEff, noise);
 
-    /*create a file from the spectrum that can then be ploted to look at the spectrum*/
+    // generate spectrum from which time/energy events are drawn
+    double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
+    createSpectrum(spectrum, mass, distance, events, useEnergyRes, useTriggerEff, noise);
+
+    /*create a file from the spectrum that can then be plotted to look at the spectrum*/
     char filename[sizeof "spectrum_0.1eV_1Mpc_160events.txt"];
-    sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents.txt",mass, distance, events);
+    sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents.txt", mass, distance, events);
     FILE *f = fopen(filename, "w+");
     for(i=0; i<((RESE-1)*REST);i++){
         fprintf(f, "%e\n", spectrum[i]);
@@ -130,9 +146,9 @@ int main(void){
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<2; filenumber++){ 
+    for (filenumber=1; filenumber<2; filenumber++){
         printf("creating file %d \n", filenumber);
-        createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
+        createEvents(mass, distance, events, useTriggerEff, useEnergyRes, filenumber, spectrum, max);
     }
 
     free(spectrum);

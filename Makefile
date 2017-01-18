@@ -16,4 +16,4 @@ spectrum.o: spectrum.c spectrum.h
 	gcc -c spectrum.c
 
 clean:
-	rm generateEvents.o generateEvents spectrum.o likelihood.o likelihood
+	rm generateEvents.o generateEvents spectrum.o likelihood.o likelihood spectrum*.txt events*.txt
