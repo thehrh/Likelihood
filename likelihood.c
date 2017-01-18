@@ -48,7 +48,7 @@ void calcLLH(double mass, double distance, double events, bool triggEff, bool en
     /*load events & store energy and time in arrays*/
     char filename[sizeof "1eV_ideal/eventsGenerated_1.34eV_10.5Mpc_1000Events_ideal_1111.txt"];
     if (triggEff && energyRes){
-        sprintf(filename, "%.1feV_real_1/events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt",mass,  mass, distance, events, filenumber);
+        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
     }
     else {
         sprintf(filename, "%.1feV_ideal_test2/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, mass, distance, events, filenumber);
@@ -149,7 +149,7 @@ int main(void){
     double noise = pow(10,-5);
 
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=8872; filenumber<10001; filenumber++){ 
+    for (filenumber=1; filenumber<12; filenumber++){ 
         printf("evaluating file %d \n", filenumber);
         calcLLH(mass, distance, events, triggEff, energyRes, filenumber, noise);
     }

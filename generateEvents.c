@@ -70,7 +70,7 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
     /*storing time & energy in file*/
     char filename[sizeof "1.5eV_ideal/eventsGenerated_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
     if (triggEff && energyRes){
-        sprintf(filename, "%.1feV_real_3/events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt",mass, mass, distance, events, filenumber);
+        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
     }
     else {
         sprintf(filename, "%.1feV_ideal_test3/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, mass, distance, events, filenumber);
@@ -114,8 +114,8 @@ int main(void){
     createSpectrum(spectrum, mass, distance, events, energyRes, triggEff, noise);
 
     /*create a file from the spectrum that can then be ploted to look at the spectrum*/
-    char filename[sizeof "spectra/spectrum_0.1eV_1Mpc_160events.txt"];
-    sprintf(filename, "spectra/spectrum_%.2feV_%.3fMpc_%.0fevents.txt",mass, distance, events);
+    char filename[sizeof "spectrum_0.1eV_1Mpc_160events.txt"];
+    sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents.txt",mass, distance, events);
     FILE *f = fopen(filename, "w+");
     for(i=0; i<((RESE-1)*REST);i++){
         fprintf(f, "%e\n", spectrum[i]);
@@ -130,7 +130,7 @@ int main(void){
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<2041; filenumber++){ 
+    for (filenumber=1; filenumber<2; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }
