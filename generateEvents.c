@@ -110,9 +110,20 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
             eventsGenerated += 1;
         }
     }
-
     fclose(f);
 }
+
+double findSpectrumMax(double *spectrum){
+    // find the maximum value in the spectrum - needed to draw random events
+    double max = 0.0;
+    int i;
+    for(i=0; i<((RESE-1)*REST);i++){
+        if(spectrum[i]>max) max = spectrum[i];
+    }
+    return max;
+}
+
+
 
 int main(void){
     /*set parameters*/
@@ -124,6 +135,7 @@ int main(void){
     double events = 10.0;
     int filenumber, i;
     double noise = pow(10,-5);
+    double max;
 
     // generate spectrum from which time/energy events are drawn
     double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
@@ -138,11 +150,7 @@ int main(void){
     }
     fclose(f);
 
-    // find the maximum value in the spectrum - needed to draw random events
-    double max = 0.0;
-    for(i=0; i<((RESE-1)*REST);i++){
-        if(spectrum[i]>max) max = spectrum[i];
-    }
+    max = findSpectrumMax(spectrum);
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/

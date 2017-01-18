@@ -2,7 +2,7 @@
 *Author: Maike Jung
 *Date: 15.11.2016
 
-*Purpose: create the arrival time spectrum of the neutrinos, that can then be uses to 
+*Purpose: create the arrival time spectrum of the neutrinos, that can then be used to
     generate random events: generateEvents.c
     calculate the likelihood for these events:  likelihood.c
     calculate the binned-likelihood:    binned_likelihood.c
@@ -26,7 +26,7 @@ double time_shift(double t, double E, double mass, double dist){
     double time = t - tDelta;
     if (time <= 0){
         return 0.0;
-    }   
+    }
     return LL_time_spectrum(time);
 }
 
@@ -44,12 +44,12 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
     double sum;
     double y, j;
     for (i = 0; i < REST; i++){
-        sum = 0.0;     
+        sum = 0.0;
         /*integrate over the energy part for every part of the spectrum*/
         for (j = 0.01; j < 60.0; j += 0.01) {
             y = LLSpectrumTotal((i*10.0/REST), j, mass, dist);
-            sum += y * 0.01; 
-        } 
+            sum += y * 0.01;
+        }
         totalArrivalTimeDist[i] = sum*(10.0/REST);
     }
     /*calculate the cumulative sum of the array*/
@@ -61,7 +61,7 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
         for (l = 0; l <= k; l++){
             cum += totalArrivalTimeDist[l];
         }
-        cumulative[k] = cum;    
+        cumulative[k] = cum;
     }
     /*calculate the 1st Hit Distribution - and normalize it*/
     double count = 0.0;
@@ -75,7 +75,7 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
 }
 
 /*calculate the correlation - new spectrum between -3 and 10s*/
-/*this is stored in an array so newSpec[0] corresponds to a time of -3s 
+/*this is stored in an array so newSpec[0] corresponds to a time of -3s
 and newSpec[1.3*REST-1] to 10s*/
 void correlation(double mass, double dist, double events, double *newSpec){
     double hitDist[REST];
@@ -95,27 +95,27 @@ void correlation(double mass, double dist, double events, double *newSpec){
 }
 
 /*generate the proper distribution*/
-void generateDist(double mass, double dist, double events, double *distribution, double *triggerEfficiency, bool energyRes){
+void generateDist(double mass, double dist, double events, double *distribution, double *triggerEffs, bool useEnergyRes){
 	double timeArray[(int) (1.3*REST)];
 	correlation(mass, dist, events, timeArray);
 	double timeShift;
 	double time;
 	int t, e, f, g;
 	int arrayIndex;
-    
+
     /*energy resolution taken into account*/
-    if (energyRes){
+    if (useEnergyRes){
         for (t=0; t<REST;t++){
             double energySpectrum[RESE];
             energySpectrum[0] = 0.0;
-            for (e=1; e<RESE; e++){  
+            for (e=1; e<RESE; e++){
 			    timeShift = dist*(mass/e)*(mass/e)*51.4635*100;
 			    time = t/(0.1*REST) - timeShift;
-			    arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);       
+			    arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
 			    if (arrayIndex <= 0){
 				    arrayIndex = 0;
 			    }
-                energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEfficiency[e];
+                energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
             }
             for (f=1; f<RESE; f+=1){
                 double pNew = 0.0;
@@ -131,14 +131,14 @@ void generateDist(double mass, double dist, double events, double *distribution,
     /*without energy resolution*/
     else {
         for (t=0; t<REST;t++){
-                for (e=1; e<RESE; e++){  
+                for (e=1; e<RESE; e++){
 			        timeShift = dist*(mass/e)*(mass/e)*51.4635*(RESE/60.0)*(RESE/60.0);
 			        time = t/(0.1*REST) - timeShift;
 			        arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
 			        if (arrayIndex <= 0){
 				        arrayIndex = 0;
 			        }
-                    distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEfficiency[e];
+                    distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
                     //printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
                 }
             }

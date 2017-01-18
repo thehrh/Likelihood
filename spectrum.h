@@ -22,6 +22,6 @@ double time_shift(double t, double E, double mass, double dist);
 double LLSpectrumTotal (double t, double E, double mass, double dist);
 void ProbFirstHitDist (double mass, double dist, double events, double *result);
 void correlation(double mass, double dist, double events, double *newSpec);
-void generateDist(double mass, double dist, double events, double *distribution, double *triggerEfficiency, bool energyRes);
+void generateDist(double mass, double dist, double events, double *distribution, double *triggerEffs, bool useEnergyRes);
 
-#endif 
+#endif
