@@ -20,11 +20,21 @@ add noise of 10-5!
 
 #include "spectrum.h"
 
+
 /* time shift due to neutrino mass */
-double time_shift(double t, double E, double mass, double dist){
+double getDeltaT(double E, double mass, double dist){
     double tDelta = dist*51.4635*(mass/E)*(mass/E);
-    double time = t - tDelta;
+    return tDelta;
+}
+
+double getTimeDelay(double t, double E, double mass, double dist){
+    return t - getDeltaT(E, mass, dist);
+}
+
+double time_shift(double t, double E, double mass, double dist){
+    double time = getTimeDelay(t, E, mass, dist);
     if (time <= 0){
+        // unphysical?
         return 0.0;
     }
     return LL_time_spectrum(time);
@@ -85,12 +95,7 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
     }
 }
 
-/*calculate the correlation - new spectrum between -3 and 10s*/
-/*this is stored in an array so newSpec[0] corresponds to a time of -3s
-and newSpec[1.3*REST-1] to 10s*/
-void correlation(double mass, double dist, double events, double *newSpec){
-    double hitDist[REST];
-    ProbFirstHitDist(mass, dist, events, hitDist);
+void convolveHitDistWithLLTimeSpec(double *hitDist, double *convolSpec){
     int i, j;
     double pNew;
     /*perform the convolution*/
@@ -100,21 +105,30 @@ void correlation(double mass, double dist, double events, double *newSpec){
             if ((i-0.3*REST + j) < REST && (i-0.3*REST + j) > 0){
                 pNew += hitDist[j] * LL_time_spectrum( (j+i-0.3*REST)/(0.1*REST) );
             }
-        newSpec[i] = pNew;
+        convolSpec[i] = pNew;
         }
     }
+}
+
+/*calculate the correlation - new spectrum between -3 and 10s*/
+/*this is stored in an array so newSpec[0] corresponds to a time of -3s
+and newSpec[1.3*REST-1] to 10s*/
+void correlation(double mass, double dist, double events, double *newSpec){
+    double hitDist[REST];
+    ProbFirstHitDist(mass, dist, events, hitDist);
+    convolveHitDistWithLLTimeSpec(hitDist, newSpec);
 }
 
 void getEnergySpec(double mass, double dist, double *timeArray, double *distribution, double *triggerEffs, bool useEnergyRes){
 	double time, timeShift;
 	int t, e, f, g, arrayIndex;
 	if (useEnergyRes){
-	for (t=0; t<REST;t++){
-			double energySpectrum[RESE];
+	    for (t=0; t<REST;t++){
+		    double energySpectrum[RESE];
 			energySpectrum[0] = 0.0;
 			for (e=1; e<RESE; e++){
-				timeShift = dist*(mass/e)*(mass/e)*51.4635*100;
-				time = t/(0.1*REST) - timeShift;
+                timeShift = getDeltaT(e, mass, dist)*100;
+                time = t/(0.1*REST) - timeShift;
 				arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
 				if (arrayIndex <= 0){
 					arrayIndex = 0;
@@ -135,17 +149,17 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
 	else {
         	for (t=0; t<REST;t++){
                 	for (e=1; e<RESE; e++){
-                                	timeShift = dist*(mass/e)*(mass/e)*51.4635*(RESE/60.0)*(RESE/60.0);
-                                	time = t/(0.1*REST) - timeShift;
-                                	arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
-                                	if (arrayIndex <= 0){
-                                        	arrayIndex = 0;
-                                	}
-                    			distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
-                    			//printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
+                        timeShift = getDeltaT(e, mass, dist)*(RESE/60.0)*(RESE/60.0);
+                        time = t/(0.1*REST) - timeShift;
+                        arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
+                        if (arrayIndex <= 0){
+                            arrayIndex = 0;
+                        }
+                        distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
+                        //printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
                 	}
-            	}
-    	}
+            }
+    }
 }
 
 void normalize(double *distribution){
