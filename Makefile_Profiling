@@ -1,0 +1,10 @@
+all: generateEvents likelihood
+
+likelihood: likelihood.c spectrum.c
+	gcc -o likelihood likelihood.c spectrum.c -lm -pg
+
+generateEvents: generateEvents.c spectrum.c
+	gcc -o generateEvents generateEvents.c spectrum.c -lm -pg
+
+clean:
+	rm generateEvents.o generateEvents generateEvents spectrum.o spectrum.o likelihood.o likelihood likelihood spectrum*.txt events*.txt
