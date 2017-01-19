@@ -91,7 +91,7 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
         sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
     }
     else {
-        sprintf(filename, "%.1feV_ideal_test3/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, mass, distance, events, filenumber);
+        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, distance, events, filenumber);
     }
     FILE *f = fopen(filename, "w");
     if (f == NULL){

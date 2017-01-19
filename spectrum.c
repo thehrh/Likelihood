@@ -31,7 +31,7 @@ double getTimeDelay(double t, double E, double mass, double dist){
     return t - getDeltaT(E, mass, dist);
 }
 
-double time_shift(double t, double E, double mass, double dist){
+double LL_time_spectrum_shifted(double t, double E, double mass, double dist){
     double time = getTimeDelay(t, E, mass, dist);
     if (time <= 0){
         // unphysical?
@@ -42,7 +42,7 @@ double time_shift(double t, double E, double mass, double dist){
 
 /* arrival time probability for a certain mass/distance - normalized */
 double LLSpectrumTotal (double t, double E, double mass, double dist){
-    return time_shift(t, E, mass, dist)*LL_energy_spectrum(E);
+    return LL_time_spectrum_shifted(t, E, mass, dist)*LL_energy_spectrum(E);
 }
 
 void cumSumT(double *arrayToSum, double *cumulative){
@@ -55,6 +55,18 @@ void cumSumT(double *arrayToSum, double *cumulative){
             cum += arrayToSum[l];
         }
         cumulative[k] = cum;
+    }
+}
+
+void firstHitDistWeightedArrivalTimeDist(double *arrivalTimeDist, double *cumulative, double events, double *result){
+    int m;
+    double count = 0.0;
+    for (m = 0; m < REST; m++){
+        result[m] = arrivalTimeDist[m]*events*pow((1 - cumulative[m]), events-1);
+        count += result[m];
+    }
+    for (m = 0; m < REST; m++){
+        result[m] = result[m]/count;
     }
 }
 
@@ -83,16 +95,7 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
     double cumulative[REST];
     cumSumT(totalArrivalTimeDist, cumulative);
 
-    /*calculate the 1st Hit Distribution - and normalize it*/
-    int m;
-    double count = 0.0;
-    for (m = 0; m < REST; m++){
-        result[m] = totalArrivalTimeDist[m]*events*pow((1 - cumulative[m]), events-1);
-        count += result[m];
-    }
-    for (m = 0; m < REST; m++){
-        result[m] = result[m]/count;
-    }
+    firstHitDistWeightedArrivalTimeDist(totalArrivalTimeDist, cumulative, events, result);
 }
 
 void convolveHitDistWithLLTimeSpec(double *hitDist, double *convolSpec){
@@ -127,14 +130,18 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
 		    double energySpectrum[RESE];
 			energySpectrum[0] = 0.0;
 			for (e=1; e<RESE; e++){
-                timeShift = getDeltaT(e, mass, dist)*100;
-                time = t/(0.1*REST) - timeShift;
+                /* TODO: The factor 100 here should probably not be hard-coded, 
+                as it depends on RESE? (RESE/60.0)*(RESE/60.0) instead? */
+                //timeShift = getDeltaT(e, mass, dist)*100;
+                //time = t/(0.1*REST) - timeShift;
+                time = getTimeDelay(t/(0.1*REST), e/(RESE/60.0), mass, dist);
 				arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
 				if (arrayIndex <= 0){
 					arrayIndex = 0;
 				}
 				energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
 			}
+            /* TODO: Speed up! */
 			for (f=1; f<RESE; f+=1){
 				double pNew = 0.0;
 				for (g=-RESE; g<RESE+1; g+=5){
@@ -149,8 +156,9 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
 	else {
         	for (t=0; t<REST;t++){
                 	for (e=1; e<RESE; e++){
-                        timeShift = getDeltaT(e, mass, dist)*(RESE/60.0)*(RESE/60.0);
-                        time = t/(0.1*REST) - timeShift;
+                        //timeShift = getDeltaT(e, mass, dist)*(RESE/60.0)*(RESE/60.0);
+                        //time = t/(0.1*REST) - timeShift;
+                        time = getTimeDelay(t/(0.1*REST), e/(RESE/60.0), mass, dist);
                         arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
                         if (arrayIndex <= 0){
                             arrayIndex = 0;

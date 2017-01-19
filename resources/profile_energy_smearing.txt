@@ -1,0 +1,111 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 87.00      2.12     2.12        1     2.12     2.14  getEnergySpec
+  4.51      2.23     0.11  6599000     0.00     0.00  getDeltaT
+  2.87      2.30     0.07        1     0.07     0.29  ProbFirstHitDist
+  2.46      2.36     0.06  6000000     0.00     0.00  LL_time_spectrum_shifted
+  1.23      2.39     0.03  6599000     0.00     0.00  getTimeDelay
+  0.82      2.41     0.02  6000000     0.00     0.00  LLSpectrumTotal
+  0.82      2.43     0.02        1     0.02     0.02  convolveHitDistWithLLTimeSpec
+  0.41      2.44     0.01        1     0.01     0.01  cumSumT
+  0.00      2.44     0.00        1     0.00     0.00  addNoise
+  0.00      2.44     0.00        1     0.00     0.31  correlation
+  0.00      2.44     0.00        1     0.00     0.00  createEvents
+  0.00      2.44     0.00        1     0.00     2.44  createSpectrum
+  0.00      2.44     0.00        1     0.00     0.00  fillTriggerEff
+  0.00      2.44     0.00        1     0.00     0.00  findSpectrumMax
+  0.00      2.44     0.00        1     0.00     0.00  firstHitDistWeightedArrivalTimeDist
+  0.00      2.44     0.00        1     0.00     2.44  generateDist
+  0.00      2.44     0.00        1     0.00     0.00  normalize
+
+			Call graph
+
+
+granularity: each sample hit covers 2 byte(s) for 0.41% of 2.44 seconds
+
+index % time    self  children    called     name
+                0.00    2.44       1/1           main [3]
+[1]    100.0    0.00    2.44       1         createSpectrum [1]
+                0.00    2.44       1/1           generateDist [2]
+                0.00    0.00       1/1           fillTriggerEff [15]
+                0.00    0.00       1/1           addNoise [13]
+-----------------------------------------------
+                0.00    2.44       1/1           createSpectrum [1]
+[2]    100.0    0.00    2.44       1         generateDist [2]
+                2.12    0.01       1/1           getEnergySpec [4]
+                0.00    0.31       1/1           correlation [5]
+                0.00    0.00       1/1           normalize [18]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]    100.0    0.00    2.44                 main [3]
+                0.00    2.44       1/1           createSpectrum [1]
+                0.00    0.00       1/1           findSpectrumMax [16]
+                0.00    0.00       1/1           createEvents [14]
+-----------------------------------------------
+                2.12    0.01       1/1           generateDist [2]
+[4]     87.4    2.12    0.01       1         getEnergySpec [4]
+                0.00    0.01  599000/6599000     getTimeDelay [9]
+-----------------------------------------------
+                0.00    0.31       1/1           generateDist [2]
+[5]     12.6    0.00    0.31       1         correlation [5]
+                0.07    0.22       1/1           ProbFirstHitDist [6]
+                0.02    0.00       1/1           convolveHitDistWithLLTimeSpec [11]
+-----------------------------------------------
+                0.07    0.22       1/1           correlation [5]
+[6]     11.8    0.07    0.22       1         ProbFirstHitDist [6]
+                0.02    0.19 6000000/6000000     LLSpectrumTotal [7]
+                0.01    0.00       1/1           cumSumT [12]
+                0.00    0.00       1/1           firstHitDistWeightedArrivalTimeDist [17]
+-----------------------------------------------
+                0.02    0.19 6000000/6000000     ProbFirstHitDist [6]
+[7]      8.5    0.02    0.19 6000000         LLSpectrumTotal [7]
+                0.06    0.13 6000000/6000000     LL_time_spectrum_shifted [8]
+-----------------------------------------------
+                0.06    0.13 6000000/6000000     LLSpectrumTotal [7]
+[8]      7.7    0.06    0.13 6000000         LL_time_spectrum_shifted [8]
+                0.03    0.10 6000000/6599000     getTimeDelay [9]
+-----------------------------------------------
+                0.00    0.01  599000/6599000     getEnergySpec [4]
+                0.03    0.10 6000000/6599000     LL_time_spectrum_shifted [8]
+[9]      5.7    0.03    0.11 6599000         getTimeDelay [9]
+                0.11    0.00 6599000/6599000     getDeltaT [10]
+-----------------------------------------------
+                0.11    0.00 6599000/6599000     getTimeDelay [9]
+[10]     4.5    0.11    0.00 6599000         getDeltaT [10]
+-----------------------------------------------
+                0.02    0.00       1/1           correlation [5]
+[11]     0.8    0.02    0.00       1         convolveHitDistWithLLTimeSpec [11]
+-----------------------------------------------
+                0.01    0.00       1/1           ProbFirstHitDist [6]
+[12]     0.4    0.01    0.00       1         cumSumT [12]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum [1]
+[13]     0.0    0.00    0.00       1         addNoise [13]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[14]     0.0    0.00    0.00       1         createEvents [14]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum [1]
+[15]     0.0    0.00    0.00       1         fillTriggerEff [15]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[16]     0.0    0.00    0.00       1         findSpectrumMax [16]
+-----------------------------------------------
+                0.00    0.00       1/1           ProbFirstHitDist [6]
+[17]     0.0    0.00    0.00       1         firstHitDistWeightedArrivalTimeDist [17]
+-----------------------------------------------
+                0.00    0.00       1/1           generateDist [2]
+[18]     0.0    0.00    0.00       1         normalize [18]
+-----------------------------------------------
+
+Index by function name
+
+   [7] LLSpectrumTotal        [14] createEvents            [2] generateDist
+   [8] LL_time_spectrum_shifted [1] createSpectrum        [10] getDeltaT
+   [6] ProbFirstHitDist       [12] cumSumT                 [4] getEnergySpec
+  [13] addNoise               [15] fillTriggerEff          [9] getTimeDelay
+  [11] convolveHitDistWithLLTimeSpec [16] findSpectrumMax [18] normalize
+   [5] correlation            [17] firstHitDistWeightedArrivalTimeDist
