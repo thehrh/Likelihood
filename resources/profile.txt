@@ -1,0 +1,82 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 90.62      2.19     2.19        1     2.19     2.19  getEnergySpec
+  7.03      2.36     0.17  6000000     0.00     0.00  time_shift
+  1.24      2.39     0.03  6000000     0.00     0.00  LLSpectrumTotal
+  1.24      2.42     0.03        1     0.03     0.23  ProbFirstHitDist
+  0.00      2.42     0.00        1     0.00     0.00  addNoise
+  0.00      2.42     0.00        1     0.00     0.23  correlation
+  0.00      2.42     0.00        1     0.00     0.00  createEvents
+  0.00      2.42     0.00        1     0.00     2.42  createSpectrum
+  0.00      2.42     0.00        1     0.00     0.00  fillTriggerEff
+  0.00      2.42     0.00        1     0.00     0.00  findSpectrumMax
+  0.00      2.42     0.00        1     0.00     2.42  generateDist
+  0.00      2.42     0.00        1     0.00     0.00  normalize
+
+			Call graph
+
+
+granularity: each sample hit covers 2 byte(s) for 0.41% of 2.42 seconds
+
+index % time    self  children    called     name
+                0.00    2.42       1/1           main [3]
+[1]    100.0    0.00    2.42       1         createSpectrum [1]
+                0.00    2.42       1/1           generateDist [2]
+                0.00    0.00       1/1           fillTriggerEff [11]
+                0.00    0.00       1/1           addNoise [9]
+-----------------------------------------------
+                0.00    2.42       1/1           createSpectrum [1]
+[2]    100.0    0.00    2.42       1         generateDist [2]
+                2.19    0.00       1/1           getEnergySpec [4]
+                0.00    0.23       1/1           correlation [6]
+                0.00    0.00       1/1           normalize [13]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]    100.0    0.00    2.42                 main [3]
+                0.00    2.42       1/1           createSpectrum [1]
+                0.00    0.00       1/1           findSpectrumMax [12]
+                0.00    0.00       1/1           createEvents [10]
+-----------------------------------------------
+                2.19    0.00       1/1           generateDist [2]
+[4]     90.5    2.19    0.00       1         getEnergySpec [4]
+-----------------------------------------------
+                0.03    0.20       1/1           correlation [6]
+[5]      9.5    0.03    0.20       1         ProbFirstHitDist [5]
+                0.03    0.17 6000000/6000000     LLSpectrumTotal [7]
+-----------------------------------------------
+                0.00    0.23       1/1           generateDist [2]
+[6]      9.5    0.00    0.23       1         correlation [6]
+                0.03    0.20       1/1           ProbFirstHitDist [5]
+-----------------------------------------------
+                0.03    0.17 6000000/6000000     ProbFirstHitDist [5]
+[7]      8.3    0.03    0.17 6000000         LLSpectrumTotal [7]
+                0.17    0.00 6000000/6000000     time_shift [8]
+-----------------------------------------------
+                0.17    0.00 6000000/6000000     LLSpectrumTotal [7]
+[8]      7.0    0.17    0.00 6000000         time_shift [8]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum [1]
+[9]      0.0    0.00    0.00       1         addNoise [9]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[10]     0.0    0.00    0.00       1         createEvents [10]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum [1]
+[11]     0.0    0.00    0.00       1         fillTriggerEff [11]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[12]     0.0    0.00    0.00       1         findSpectrumMax [12]
+-----------------------------------------------
+                0.00    0.00       1/1           generateDist [2]
+[13]     0.0    0.00    0.00       1         normalize [13]
+-----------------------------------------------
+
+Index by function name
+
+   [7] LLSpectrumTotal        [10] createEvents            [2] generateDist
+   [5] ProbFirstHitDist        [1] createSpectrum          [4] getEnergySpec
+   [9] addNoise               [11] fillTriggerEff         [13] normalize
+   [6] correlation            [12] findSpectrumMax         [8] time_shift
