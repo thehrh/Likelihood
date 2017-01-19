@@ -35,6 +35,19 @@ double LLSpectrumTotal (double t, double E, double mass, double dist){
     return time_shift(t, E, mass, dist)*LL_energy_spectrum(E);
 }
 
+void cumSumT(double *arrayToSum, double *cumulative){
+    /*calculate the cumulative sum of the arrival time distribution*/
+    int k, l;
+    double cum;
+    for (k = 0; k < REST; k++){
+        cum = 0.0;
+        for (l = 0; l <= k; l++){
+            cum += arrayToSum[l];
+        }
+        cumulative[k] = cum;
+    }
+}
+
 /* calculate the probability to get the first hit after a certain amount of time */
 void ProbFirstHitDist (double mass, double dist, double events, double *result){
     /*arrival time distribution of all the hits (for a certain mass) - project the E,t spectrum
@@ -42,28 +55,26 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
     double totalArrivalTimeDist[REST];
     int i;
     double sum;
-    double y, j;
+    double y, e;
     for (i = 0; i < REST; i++){
+        /* set the sum to zero for each time bin */
         sum = 0.0;
-        /*integrate over the energy part for every part of the spectrum*/
-        for (j = 0.01; j < 60.0; j += 0.01) {
-            y = LLSpectrumTotal((i*10.0/REST), j, mass, dist);
+        /*Integrate over the energy part for every time bin. We move in 0.01 MeV
+        steps up to 60 MeV. For each pair of time and energy, we compute the
+        product of time and energy PDF ("LLSpectrumTotal"), continually 
+        incrementing the sum*/
+        for (e = 0.01; e < 60.0; e += 0.01) {
+            y = LLSpectrumTotal((i*10.0/REST), e, mass, dist);
             sum += y * 0.01;
         }
         totalArrivalTimeDist[i] = sum*(10.0/REST);
     }
-    /*calculate the cumulative sum of the array*/
+
     double cumulative[REST];
-    int k, l, m;
-    double cum;
-    for (k = 0; k <REST; k++){
-        cum = 0.0;
-        for (l = 0; l <= k; l++){
-            cum += totalArrivalTimeDist[l];
-        }
-        cumulative[k] = cum;
-    }
+    cumSumT(totalArrivalTimeDist, cumulative);
+
     /*calculate the 1st Hit Distribution - and normalize it*/
+    int m;
     double count = 0.0;
     for (m = 0; m < REST; m++){
         result[m] = totalArrivalTimeDist[m]*events*pow((1 - cumulative[m]), events-1);

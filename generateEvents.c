@@ -28,8 +28,6 @@ void fillTriggerEff(double *triggerEns, double *triggerEffs, bool useTriggerEff)
      Note that the trigger efficiency file for the chosen resolution needs
      to be located in the current directory.*/
     int i;
-    /* initialize with 1 in case triggerEfficiency is not used*/
-    for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
     if(useTriggerEff){
         FILE *myFile;
         if (RESE==600){
@@ -49,6 +47,10 @@ void fillTriggerEff(double *triggerEns, double *triggerEffs, bool useTriggerEff)
         }
         fclose(myFile);
     }
+    else{
+        /* initialize with 1s for ideal trigger efficiency */
+        for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+    }
 }
 
 void addNoise(double *spectrum, double noise){
@@ -61,7 +63,6 @@ void addNoise(double *spectrum, double noise){
 }
 
 void createSpectrum(double *spectrum, double mass, double distance, double events, bool useEnergyRes, bool useTriggerEff, double noise){
-    int i;
     double triggerEns[RESE+1];
     double triggerEffs[RESE+1];
 
