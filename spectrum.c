@@ -94,62 +94,68 @@ void correlation(double mass, double dist, double events, double *newSpec){
     }
 }
 
+void getEnergySpec(double mass, double dist, double *timeArray, double *distribution, double *triggerEffs, bool useEnergyRes){
+	double time, timeShift;
+	int t, e, f, g, arrayIndex;
+	if (useEnergyRes){
+	for (t=0; t<REST;t++){
+			double energySpectrum[RESE];
+			energySpectrum[0] = 0.0;
+			for (e=1; e<RESE; e++){
+				timeShift = dist*(mass/e)*(mass/e)*51.4635*100;
+				time = t/(0.1*REST) - timeShift;
+				arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
+				if (arrayIndex <= 0){
+					arrayIndex = 0;
+				}
+				energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
+			}
+			for (f=1; f<RESE; f+=1){
+				double pNew = 0.0;
+				for (g=-RESE; g<RESE+1; g+=5){
+					if (f-g >=0 && f-g <=RESE){
+						pNew += GAUSS(g/(RESE/60.0),f/(RESE/60.0))*energySpectrum[f-g];
+					}
+					distribution[t*(RESE-1) +f-1] = pNew/(RESE/60.0);
+				}
+			}
+		}
+	}
+	else {
+        	for (t=0; t<REST;t++){
+                	for (e=1; e<RESE; e++){
+                                	timeShift = dist*(mass/e)*(mass/e)*51.4635*(RESE/60.0)*(RESE/60.0);
+                                	time = t/(0.1*REST) - timeShift;
+                                	arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
+                                	if (arrayIndex <= 0){
+                                        	arrayIndex = 0;
+                                	}
+                    			distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
+                    			//printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
+                	}
+            	}
+    	}
+}
+
+void normalize(double *distribution){
+	// normalize the spectrum to 1
+	int k;
+	double normalize = 0;
+
+	for (k=0; k<(RESE-1)*REST;k++){
+		normalize += distribution[k]*(1/(REST*0.1))*(1/(RESE/60.0));
+	}
+
+	for (k=0; k<(RESE-1)*REST;k++){
+        	distribution[k] *= 1.0/normalize;
+    	}
+
+}
+
 /*generate the proper distribution*/
 void generateDist(double mass, double dist, double events, double *distribution, double *triggerEffs, bool useEnergyRes){
 	double timeArray[(int) (1.3*REST)];
 	correlation(mass, dist, events, timeArray);
-	double timeShift;
-	double time;
-	int t, e, f, g;
-	int arrayIndex;
-
-    /*energy resolution taken into account*/
-    if (useEnergyRes){
-        for (t=0; t<REST;t++){
-            double energySpectrum[RESE];
-            energySpectrum[0] = 0.0;
-            for (e=1; e<RESE; e++){
-			    timeShift = dist*(mass/e)*(mass/e)*51.4635*100;
-			    time = t/(0.1*REST) - timeShift;
-			    arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
-			    if (arrayIndex <= 0){
-				    arrayIndex = 0;
-			    }
-                energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
-            }
-            for (f=1; f<RESE; f+=1){
-                double pNew = 0.0;
-                for (g=-RESE; g<RESE+1; g+=5){
-                    if (f-g >=0 && f-g <=RESE){
-                        pNew += GAUSS(g/(RESE/60.0),f/(RESE/60.0))*energySpectrum[f-g];
-                    }
-                distribution[t*(RESE-1) +f-1] = pNew/(RESE/60.0);
-                }
-            }
-        }
-    }
-    /*without energy resolution*/
-    else {
-        for (t=0; t<REST;t++){
-                for (e=1; e<RESE; e++){
-			        timeShift = dist*(mass/e)*(mass/e)*51.4635*(RESE/60.0)*(RESE/60.0);
-			        time = t/(0.1*REST) - timeShift;
-			        arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
-			        if (arrayIndex <= 0){
-				        arrayIndex = 0;
-			        }
-                    distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
-                    //printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
-                }
-            }
-    }
-    // normalize the spectrum to one
-    int k;
-    double normalize = 0;
-    for (k=0; k<(RESE-1)*REST;k++){
-        normalize += distribution[k]*(1/(REST*0.1))*(1/(RESE/60.0));
-    }
-    for (k=0; k<(RESE-1)*REST;k++){
-        distribution[k] *= 1.0/normalize;
-    }
+	getEnergySpec(mass, dist, timeArray, distribution, triggerEffs, useEnergyRes);
+	normalize(distribution);
 }
