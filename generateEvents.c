@@ -57,7 +57,7 @@ void fillTriggerEff(double *triggerEffs, bool useTriggerEff){
 void addNoise(double *spectrum, double noise){
     int i;
     // add constant noise floor to the spectrum
-    for (i=0; i<(RESE-1)*REST;i++){
+    for (i=0; i<(RESE-1)*REST; i++){
         //spectrum[i] *= 0.99;
         spectrum[i] += noise;
     }
@@ -118,7 +118,7 @@ double findSpectrumMax(double *spectrum){
     // find the maximum value in the spectrum - needed to draw random events
     double max = 0.0;
     int i;
-    for(i=0; i<((RESE-1)*REST);i++){
+    for(i=0; i<((RESE-1)*REST); i++){
         if(spectrum[i]>max) max = spectrum[i];
     }
     return max;

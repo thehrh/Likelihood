@@ -85,11 +85,11 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
         steps up to 60 MeV. For each pair of time and energy, we compute the
         product of time and energy PDF ("LLSpectrumTotal"), continually 
         incrementing the sum*/
-        for (e = 0.01; e < 60.0; e += 0.01) {
-            y = LLSpectrumTotal((i*10.0/REST), e, mass, dist);
+        for (e = 0.01; e < EMAX; e += 0.01) {
+            y = LLSpectrumTotal(i*STEPT, e, mass, dist);
             sum += y * 0.01;
         }
-        totalArrivalTimeDist[i] = sum*(10.0/REST);
+        totalArrivalTimeDist[i] = sum*STEPT;
     }
 
     double cumulative[REST];
@@ -106,7 +106,7 @@ void convolveHitDistWithLLTimeSpec(double *hitDist, double *convolSpec){
         pNew = 0.0;
         for (j = 0; j < REST; j++){
             if ((i-0.3*REST + j) < REST && (i-0.3*REST + j) > 0){
-                pNew += hitDist[j] * LL_time_spectrum( (j+i-0.3*REST)/(0.1*REST) );
+                pNew += hitDist[j] * LL_time_spectrum( (j+i-0.3*REST)*STEPT );
             }
         convolSpec[i] = pNew;
         }
@@ -126,7 +126,7 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
 	double time, timeShift;
 	int t, e, f, g, arrayIndex;
 	if (useEnergyRes){
-	    for (t=0; t<REST;t++){
+	    for (t=0; t<REST; t++){
             double energySpectrum[RESE];
             energySpectrum[0] = 0.0;
             for (e=1; e<RESE; e++){
@@ -134,36 +134,36 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
                 as it depends on RESE? (RESE/60.0)*(RESE/60.0) instead? */
                 //timeShift = getDeltaT(e, mass, dist)*100;
                 //time = t/(0.1*REST) - timeShift;
-                time = getTimeDelay(t/(0.1*REST), e/(RESE/60.0), mass, dist);
-                arrayIndex = (int) (time*(0.1*REST) + 0.3*REST);
+                time = getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+                arrayIndex = (int) (time/(STEPT) + 0.3*REST);
                 if (arrayIndex <= 0){
                     arrayIndex = 0;
                 }
-                energySpectrum[e] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
+                energySpectrum[e] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
             }
             /* TODO: Speed up! */
             for (f=1; f<RESE; f+=1){
                 double pNew = 0.0;
                 for (g=-RESE; g<RESE+1; g+=5){
                     if (f-g >=0 && f-g <=RESE){
-                        pNew += GAUSS(g/(RESE/60.0),f/(RESE/60.0))*energySpectrum[f-g];
+                        pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
                     }
-                    distribution[t*(RESE-1) +f-1] = pNew/(RESE/60.0);
+                    distribution[t*(RESE-1) +f-1] = pNew*STEPE;
                 }
             }
         }
     }
 	else {
-        for (t=0; t<REST;t++){
+        for (t=0; t<REST; t++){
             for (e=1; e<RESE; e++){
                 //timeShift = getDeltaT(e, mass, dist)*(RESE/60.0)*(RESE/60.0);
                 //time = t/(0.1*REST) - timeShift;
-                time = getTimeDelay(t/(0.1*REST), e/(RESE/60.0), mass, dist);
-                arrayIndex = (int) (time*(0.1*REST) + (0.3*REST));
+                time = getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+                arrayIndex = (int) (time/(STEPT) + (0.3*REST));
                 if (arrayIndex <= 0){
                     arrayIndex = 0;
                 }
-                distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e/(RESE/60.0))*timeArray[arrayIndex]*triggerEffs[e];
+                distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
                 //printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
             }
         }
@@ -175,11 +175,11 @@ void normalize(double *distribution){
 	int k;
 	double normalize = 0;
 
-	for (k=0; k<(RESE-1)*REST;k++){
-		normalize += distribution[k]*(1/(REST*0.1))*(1/(RESE/60.0));
+	for (k=0; k<(RESE-1)*REST; k++){
+		normalize += distribution[k]*STEPT*STEPE;
 	}
 
-	for (k=0; k<(RESE-1)*REST;k++){
+	for (k=0; k<(RESE-1)*REST; k++){
         	distribution[k] *= 1.0/normalize;
     	}
 

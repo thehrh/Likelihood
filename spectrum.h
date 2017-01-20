@@ -5,6 +5,10 @@
 
 #define RESE 600
 #define REST 1000
+#define EMAX 60.0
+#define TMAX 10.0
+#define STEPE EMAX/RESE
+#define STEPT TMAX/REST
 
 /* normalized LL energy spectrum - 15.4 average energy, 3.8: betha, 4802: normalization factor*/
 #define LL_energy_spectrum(E) pow(E, 3.8)*exp(-(1.0+3.8)*E/15.4)/4802.516160
