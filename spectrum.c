@@ -122,50 +122,39 @@ void correlation(double mass, double dist, double events, double *newSpec){
     convolveHitDistWithLLTimeSpec(hitDist, newSpec);
 }
 
+void applyEnergyRes(int t, double *distribution, double *energySpectrum){
+    int f, g;
+    for (f=1; f<RESE; f+=1){
+        double pNew = 0.0;
+        for (g=-RESE; g<RESE+1; g+=5){
+            if (f-g >= 0 && f-g <= RESE){
+                pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
+            }
+            distribution[t*(RESE-1)+f-1] = pNew*STEPE;
+        }
+    }
+}
+
 void getEnergySpec(double mass, double dist, double *timeArray, double *distribution, double *triggerEffs, bool useEnergyRes){
 	double time, timeShift;
 	int t, e, f, g, arrayIndex;
-	if (useEnergyRes){
-	    for (t=0; t<REST; t++){
-            double energySpectrum[RESE];
-            energySpectrum[0] = 0.0;
-            for (e=1; e<RESE; e++){
-                /* TODO: The factor 100 here should probably not be hard-coded, 
-                as it depends on RESE? (RESE/60.0)*(RESE/60.0) instead? */
-                //timeShift = getDeltaT(e, mass, dist)*100;
-                //time = t/(0.1*REST) - timeShift;
-                time = getTimeDelay(t*STEPT, e*STEPE, mass, dist);
-                arrayIndex = (int) (time/(STEPT) + 0.3*REST);
-                if (arrayIndex <= 0){
-                    arrayIndex = 0;
-                }
-                energySpectrum[e] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+
+    for (t=0; t<REST; t++){
+        double energySpectrum[RESE];
+        energySpectrum[0] = 0.0;
+        for (e=1; e<RESE; e++){
+            time = getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+            arrayIndex = (int) (time/(STEPT) + 0.3*REST);
+            if (arrayIndex <= 0){
+                arrayIndex = 0;
             }
-            /* TODO: Speed up! */
-            for (f=1; f<RESE; f+=1){
-                double pNew = 0.0;
-                for (g=-RESE; g<RESE+1; g+=5){
-                    if (f-g >=0 && f-g <=RESE){
-                        pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
-                    }
-                    distribution[t*(RESE-1) +f-1] = pNew*STEPE;
-                }
+            energySpectrum[e] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+            if (!useEnergyRes){
+                distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
             }
         }
-    }
-	else {
-        for (t=0; t<REST; t++){
-            for (e=1; e<RESE; e++){
-                //timeShift = getDeltaT(e, mass, dist)*(RESE/60.0)*(RESE/60.0);
-                //time = t/(0.1*REST) - timeShift;
-                time = getTimeDelay(t*STEPT, e*STEPE, mass, dist);
-                arrayIndex = (int) (time/(STEPT) + (0.3*REST));
-                if (arrayIndex <= 0){
-                    arrayIndex = 0;
-                }
-                distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
-                //printf("corr spec: %f %f %e\n", t*10.0/REST, e*60.0/RESE, distribution[t*(RESE-1) +e]);
-            }
+        if (useEnergyRes){
+            applyEnergyRes(t, distribution, energySpectrum);
         }
     }
 }
