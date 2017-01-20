@@ -153,3 +153,39 @@ void generateDist(double mass, double dist, double events, double *distribution,
         distribution[k] *= 1.0/normalize;
     }
 }
+
+void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
+    /*read in trigger efficiency*/
+    int i;
+    double triggerEnergy[RESE+1];
+    double triggerEfficiency[RESE+1];
+    /* initialize with 1 in case triggerEfficiency is not used*/
+    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1.0);
+    if(triggEff){
+        FILE *myFile;
+        if (RESE==600){
+            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
+        }
+        else if (RESE==6000){
+            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
+        }
+        else if (RESE==60000){
+            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
+        }
+        else {
+            printf("Invalid grid size for the energy resolution.");
+        }
+        for (i = 0; i < RESE+1; i++) {
+            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
+        }
+        fclose(myFile);
+    }
+
+    /*create the spectrum from which the random events are drawn*/
+	generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
+    // add noise to the spectrum
+    for (i=0; i<(RESE-1)*REST;i++){
+        spectrum[i] += noise;
+    }
+}
+
