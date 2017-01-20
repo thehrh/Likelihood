@@ -136,7 +136,7 @@ void applyEnergyRes(int t, double *distribution, double *energySpectrum){
 }
 
 void getEnergySpec(double mass, double dist, double *timeArray, double *distribution, double *triggerEffs, bool useEnergyRes){
-	double time, timeShift;
+	double time, timeShift, pUnsmeared;
 	int t, e, f, g, arrayIndex;
 
     for (t=0; t<REST; t++){
@@ -148,10 +148,11 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
             if (arrayIndex <= 0){
                 arrayIndex = 0;
             }
-            energySpectrum[e] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+            pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
             if (!useEnergyRes){
-                distribution[t*(RESE-1) +e-1] = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+                distribution[t*(RESE-1) +e-1] = pUnsmeared;
             }
+            energySpectrum[e] = pUnsmeared;
         }
         if (useEnergyRes){
             applyEnergyRes(t, distribution, energySpectrum);
