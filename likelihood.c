@@ -13,6 +13,7 @@ UNITS: mass: eV
        time: s
 
 BINNING: see spectrum.h
+
 */
 
 #include "spectrum.h"
