@@ -22,10 +22,10 @@
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-double time_shift(double t, double E, double mass, double dist);
-double LLSpectrumTotal (double t, double E, double mass, double dist);
-void ProbFirstHitDist (double mass, double dist, double events, double *result);
-void correlation(double mass, double dist, double events, double *newSpec);
-void generateDist(double mass, double dist, double events, double *distribution, double *triggerEffs, bool useEnergyRes);
+double time_shift(double t, double E, float mass, float dist);
+double LLSpectrumTotal (double t, double E, float mass, float dist);
+void ProbFirstHitDist (float mass, float dist, double events, float *result);
+void correlation(float mass, float dist, double events, float *newSpec);
+void generateDist(float mass, float dist, double events, float *distribution, float *triggerEffs, bool useEnergyRes);
 
 #endif

@@ -1,0 +1,215 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 30.34      0.10     0.10                             getDeltaT(double, float, float)
+ 24.27      0.18     0.08                             LL_time_spectrum_shifted(double, double, float, float)
+ 12.14      0.22     0.04        1    40.05    40.05  createEvents(float, float, double, bool, bool, int, float*, double)
+ 12.14      0.26     0.04                             ProbFirstHitDist(float, float, double, float*)
+  9.10      0.29     0.03                             LLSpectrumTotal(double, double, float, float)
+  6.07      0.31     0.02                             getTimeDelay(double, double, float, float)
+  6.07      0.33     0.02                             convolveHitDistWithLLTimeSpec(float*, float*)
+  0.00      0.33     0.00        1     0.00     0.00  createSpectrum(float*, float, float, double, bool, bool, float)
+  0.00      0.33     0.00        1     0.00     0.00  fillTriggerEff(float*, bool)
+  0.00      0.33     0.00        1     0.00     0.00  findSpectrumMax(float*)
+  0.00      0.33     0.00        1     0.00     0.00  addNoise(float*, float)
+  0.00      0.33     0.00                             cudaError cudaLaunch<char>(char*)
+  0.00      0.33     0.00                             cudaError cudaMalloc<float>(float**, unsigned long)
+  0.00      0.33     0.00                             correlation(float, float, double, float*)
+  0.00      0.33     0.00                             generateDist(float, float, double, float*, float*, bool)
+  0.00      0.33     0.00                             getEnergySpec(float*, float*, float*, float*, float*, bool)
+  0.00      0.33     0.00                             applyEnergyRes(int, float*, float*)
+  0.00      0.33     0.00                             firstHitDistWeightedArrivalTimeDist(float*, float*, double, float*)
+  0.00      0.33     0.00                             __device_stub__Z13getEnergySpecPfS_S_S_S_b(float*, float*, float*, float*, float*, bool)
+  0.00      0.33     0.00                             cumSumT(float*, float*)
+  0.00      0.33     0.00                             normalize(float*)
+  0.00      0.33     0.00                             ____nv_dummy_param_ref(void*)
+  0.00      0.33     0.00                             __cudaUnregisterBinaryUtil()
+  0.00      0.33     0.00                             __nv_cudaEntityRegisterCallback(void**)
+  0.00      0.33     0.00                             __nv_init_managed_rt_with_module(void**)
+  0.00      0.33     0.00                             __nv_save_fatbinhandle_for_managed_rt(void**)
+  0.00      0.33     0.00                             __sti____cudaRegisterAll_43_tmpxft_00001430_00000000_7_spectrum_cpp1_ii_05bc70bc()
+  0.00      0.33     0.00                             dim3::dim3(unsigned int, unsigned int, unsigned int)
+  0.00      0.33     0.00                             __gnu_cxx::__promote_2<float, double, __gnu_cxx::__promote<float, std::__is_integer<float>::__value>::__type, __gnu_cxx::__promote<double, std::__is_integer<double>::__value>::__type>::__type std::pow<float, double>(float, double)
+  0.00      0.33     0.00                             __do_global_dtors_aux
+  0.00      0.33     0.00                             __do_global_dtors_aux_fini_array_entry
+  0.00      0.33     0.00                             __frame_dummy_init_array_entry
+  0.00      0.33     0.00                             __gmon_start__
+  0.00      0.33     0.00                             __libc_csu_fini
+  0.00      0.33     0.00                             __libc_csu_init
+  0.00      0.33     0.00                             _fini
+  0.00      0.33     0.00                             _init
+  0.00      0.33     0.00                             _start
+  0.00      0.33     0.00                             atexit
+  0.00      0.33     0.00                             data_start
+  0.00      0.33     0.00                             deregister_tm_clones
+  0.00      0.33     0.00                             etext
+  0.00      0.33     0.00                             frame_dummy
+  0.00      0.33     0.00                             main
+  0.00      0.33     0.00                             register_tm_clones
+
+			Call graph
+
+
+granularity: each sample hit covers 2 byte(s) for 3.03% of 0.33 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     30.3    0.10    0.00                 getDeltaT(double, float, float) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     24.2    0.08    0.00                 LL_time_spectrum_shifted(double, double, float, float) [2]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     12.1    0.00    0.04                 main [3]
+                0.04    0.00       1/1           createEvents(float, float, double, bool, bool, int, float*, double) [4]
+                0.00    0.00       1/1           createSpectrum(float*, float, float, double, bool, bool, float) [15]
+                0.00    0.00       1/1           findSpectrumMax(float*) [17]
+-----------------------------------------------
+                0.04    0.00       1/1           main [3]
+[4]     12.1    0.04    0.00       1         createEvents(float, float, double, bool, bool, int, float*, double) [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]     12.1    0.04    0.00                 ProbFirstHitDist(float, float, double, float*) [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      9.1    0.03    0.00                 LLSpectrumTotal(double, double, float, float) [6]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      6.1    0.02    0.00                 getTimeDelay(double, double, float, float) [7]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]      6.1    0.02    0.00                 convolveHitDistWithLLTimeSpec(float*, float*) [8]
+-----------------------------------------------
+                                                 <spontaneous>
+[9]      0.0    0.00    0.00                 atexit [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[10]     0.0    0.00    0.00                 data_start [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     0.0    0.00    0.00                 deregister_tm_clones [11]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.0    0.00    0.00                 etext [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[13]     0.0    0.00    0.00                 frame_dummy [13]
+-----------------------------------------------
+                                                 <spontaneous>
+[14]     0.0    0.00    0.00                 register_tm_clones [14]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[15]     0.0    0.00    0.00       1         createSpectrum(float*, float, float, double, bool, bool, float) [15]
+                0.00    0.00       1/1           fillTriggerEff(float*, bool) [16]
+                0.00    0.00       1/1           addNoise(float*, float) [18]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum(float*, float, float, double, bool, bool, float) [15]
+[16]     0.0    0.00    0.00       1         fillTriggerEff(float*, bool) [16]
+-----------------------------------------------
+                0.00    0.00       1/1           main [3]
+[17]     0.0    0.00    0.00       1         findSpectrumMax(float*) [17]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum(float*, float, float, double, bool, bool, float) [15]
+[18]     0.0    0.00    0.00       1         addNoise(float*, float) [18]
+-----------------------------------------------
+                                                 <spontaneous>
+[19]     0.0    0.00    0.00                 cudaError cudaLaunch<char>(char*) [19]
+-----------------------------------------------
+                                                 <spontaneous>
+[20]     0.0    0.00    0.00                 cudaError cudaMalloc<float>(float**, unsigned long) [20]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     0.0    0.00    0.00                 correlation(float, float, double, float*) [21]
+-----------------------------------------------
+                                                 <spontaneous>
+[22]     0.0    0.00    0.00                 generateDist(float, float, double, float*, float*, bool) [22]
+-----------------------------------------------
+                                                 <spontaneous>
+[23]     0.0    0.00    0.00                 getEnergySpec(float*, float*, float*, float*, float*, bool) [23]
+-----------------------------------------------
+                                                 <spontaneous>
+[24]     0.0    0.00    0.00                 applyEnergyRes(int, float*, float*) [24]
+-----------------------------------------------
+                                                 <spontaneous>
+[25]     0.0    0.00    0.00                 firstHitDistWeightedArrivalTimeDist(float*, float*, double, float*) [25]
+-----------------------------------------------
+                                                 <spontaneous>
+[26]     0.0    0.00    0.00                 __device_stub__Z13getEnergySpecPfS_S_S_S_b(float*, float*, float*, float*, float*, bool) [26]
+-----------------------------------------------
+                                                 <spontaneous>
+[27]     0.0    0.00    0.00                 cumSumT(float*, float*) [27]
+-----------------------------------------------
+                                                 <spontaneous>
+[28]     0.0    0.00    0.00                 normalize(float*) [28]
+-----------------------------------------------
+                                                 <spontaneous>
+[29]     0.0    0.00    0.00                 ____nv_dummy_param_ref(void*) [29]
+-----------------------------------------------
+                                                 <spontaneous>
+[30]     0.0    0.00    0.00                 __cudaUnregisterBinaryUtil() [30]
+-----------------------------------------------
+                                                 <spontaneous>
+[31]     0.0    0.00    0.00                 __nv_cudaEntityRegisterCallback(void**) [31]
+-----------------------------------------------
+                                                 <spontaneous>
+[32]     0.0    0.00    0.00                 __nv_init_managed_rt_with_module(void**) [32]
+-----------------------------------------------
+                                                 <spontaneous>
+[33]     0.0    0.00    0.00                 __nv_save_fatbinhandle_for_managed_rt(void**) [33]
+-----------------------------------------------
+                                                 <spontaneous>
+[34]     0.0    0.00    0.00                 __sti____cudaRegisterAll_43_tmpxft_00001430_00000000_7_spectrum_cpp1_ii_05bc70bc() [34]
+-----------------------------------------------
+                                                 <spontaneous>
+[35]     0.0    0.00    0.00                 dim3::dim3(unsigned int, unsigned int, unsigned int) [35]
+-----------------------------------------------
+                                                 <spontaneous>
+[36]     0.0    0.00    0.00                 __gnu_cxx::__promote_2<float, double, __gnu_cxx::__promote<float, std::__is_integer<float>::__value>::__type, __gnu_cxx::__promote<double, std::__is_integer<double>::__value>::__type>::__type std::pow<float, double>(float, double) [36]
+-----------------------------------------------
+                                                 <spontaneous>
+[37]     0.0    0.00    0.00                 __do_global_dtors_aux [37]
+-----------------------------------------------
+                                                 <spontaneous>
+[38]     0.0    0.00    0.00                 __do_global_dtors_aux_fini_array_entry [38]
+-----------------------------------------------
+                                                 <spontaneous>
+[39]     0.0    0.00    0.00                 __frame_dummy_init_array_entry [39]
+-----------------------------------------------
+                                                 <spontaneous>
+[40]     0.0    0.00    0.00                 __gmon_start__ [40]
+-----------------------------------------------
+                                                 <spontaneous>
+[41]     0.0    0.00    0.00                 __libc_csu_fini [41]
+-----------------------------------------------
+                                                 <spontaneous>
+[42]     0.0    0.00    0.00                 __libc_csu_init [42]
+-----------------------------------------------
+                                                 <spontaneous>
+[43]     0.0    0.00    0.00                 _fini [43]
+-----------------------------------------------
+                                                 <spontaneous>
+[44]     0.0    0.00    0.00                 _init [44]
+-----------------------------------------------
+                                                 <spontaneous>
+[45]     0.0    0.00    0.00                 _start [45]
+-----------------------------------------------
+
+Index by function name
+
+  [19] cudaError cudaLaunch<char>(char*) [25] firstHitDistWeightedArrivalTimeDist(float*, float*, double, float*) [38] __do_global_dtors_aux_fini_array_entry
+  [20] cudaError cudaMalloc<float>(float**, unsigned long) [26] __device_stub__Z13getEnergySpecPfS_S_S_S_b(float*, float*, float*, float*, float*, bool) [39] __frame_dummy_init_array_entry
+  [21] correlation(float, float, double, float*) [27] cumSumT(float*, float*) [40] __gmon_start__
+   [4] createEvents(float, float, double, bool, bool, int, float*, double) [18] addNoise(float*, float) [41] __libc_csu_fini
+  [22] generateDist(float, float, double, float*, float*, bool) [1] getDeltaT(double, float, float) [42] __libc_csu_init
+   [7] getTimeDelay(double, double, float, float) [28] normalize(float*) [43] _fini
+  [23] getEnergySpec(float*, float*, float*, float*, float*, bool) [29] ____nv_dummy_param_ref(void*) [44] _init
+  [24] applyEnergyRes(int, float*, float*) [30] __cudaUnregisterBinaryUtil() [45] _start
+  [15] createSpectrum(float*, float, float, double, bool, bool, float) [31] __nv_cudaEntityRegisterCallback(void**) [9] atexit
+  [16] fillTriggerEff(float*, bool) [32] __nv_init_managed_rt_with_module(void**) [10] data_start
+   [6] LLSpectrumTotal(double, double, float, float) [33] __nv_save_fatbinhandle_for_managed_rt(void**) [11] deregister_tm_clones
+  [17] findSpectrumMax(float*) [34] __sti____cudaRegisterAll_43_tmpxft_00001430_00000000_7_spectrum_cpp1_ii_05bc70bc() [12] etext
+   [5] ProbFirstHitDist(float, float, double, float*) [35] dim3::dim3(unsigned int, unsigned int, unsigned int) [13] frame_dummy
+   [2] LL_time_spectrum_shifted(double, double, float, float) [36] __gnu_cxx::__promote_2<float, double, __gnu_cxx::__promote<float, std::__is_integer<float>::__value>::__type, __gnu_cxx::__promote<double, std::__is_integer<double>::__value>::__type>::__type std::pow<float, double>(float, double) [3] main
+   [8] convolveHitDistWithLLTimeSpec(float*, float*) [37] __do_global_dtors_aux [14] register_tm_clones
