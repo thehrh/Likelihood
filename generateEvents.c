@@ -23,12 +23,13 @@ generate random events for: E=0.1-60.0 0.1
                             t=0.0-10.0 0.001
 */
 
+/*
 void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
-    /*read in trigger efficiency*/
+    /*read in trigger efficiency
     int i;
     double triggerEnergy[RESE+1];
     double triggerEfficiency[RESE+1];
-    /* initialize with 1 in case triggerEfficiency is not used*/
+    /* initialize with 1 in case triggerEfficiency is not used
     for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1.0);
     if(triggEff){
         FILE *myFile;
@@ -50,7 +51,7 @@ void createSpectrum(double *spectrum, double mass, double distance, double event
         fclose(myFile);
     }
 
-    /*create the spectrum from which the random events are drawn*/
+    /*create the spectrum from which the random events are drawn
 	generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
     // add noise to the spectrum
     for (i=0; i<(RESE-1)*REST;i++){
@@ -61,9 +62,9 @@ void createSpectrum(double *spectrum, double mass, double distance, double event
     for (i=0; i<(RESE-1)*REST;i++){
         testsum += spectrum[i]*(1/(REST*0.1))*(1/(RESE/60.0));
     }
-    printf("testsum %f \n", testsum);*/
+    printf("testsum %f \n", testsum);
 }
-
+*/
 
 void createEvents(double mass, double distance, double events, bool triggEff, bool energyRes, int filenumber, double *spectrum, double max){
 
@@ -114,7 +115,7 @@ int main(void){
     createSpectrum(spectrum, mass, distance, events, energyRes, triggEff, noise);
 
     /*create a file from the spectrum that can then be ploted to look at the spectrum*/
-    char filename[sizeof "spectrum_0.1eV_1Mpc_160events.txt"];
+    char filename[sizeof "spectrum_0.1eV_1Mpc_160events_test.txt"];
     sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents.txt",mass, distance, events);
     FILE *f = fopen(filename, "w+");
     for(i=0; i<((RESE-1)*REST);i++){
@@ -130,7 +131,7 @@ int main(void){
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<2; filenumber++){ 
+    for (filenumber=1; filenumber<1; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }
