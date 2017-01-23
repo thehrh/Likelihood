@@ -191,7 +191,7 @@ void normalize(user_data_t *distribution){
 	}
 
 	for (k=0; k<(RESE-1)*REST; k++){
-        distribution[k] *= 1.0/normalize;
+		distribution[k] *= 1.0/normalize;
     	}
 }
 
@@ -210,8 +210,9 @@ void getEnergySpec(user_data_t *mass, user_data_t *dist, user_data_t *timeArray,
             // make this explicit for now, until know how to call function correctly
             time =  t*STEPT - (*dist)*51.4635*(*mass/(e*STEPE))*(*mass/(e*STEPE));//getTimeDelay(t*STEPT, e*STEPE, mass, dist);
             arrayIndex = (int) (time/(STEPT) + 0.3*REST);
-            if (arrayIndex <= 0)
+            if (arrayIndex <= 0){
                 arrayIndex = 0;
+	    }
 	    pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
             if (!useEnergyRes){
                 distribution[t*(RESE-1) +e-1] = pUnsmeared;
@@ -227,10 +228,9 @@ void getEnergySpec(user_data_t *mass, user_data_t *dist, user_data_t *timeArray,
                     if (f-g >= 0 && f-g <= RESE){
                         pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
 		    }
-                    distribution[t*(RESE-1)+f-1] = pNew*STEPE;
                 }
+                distribution[t*(RESE-1)+f-1] = pNew*STEPE;
             }
-	        
 	}
     }	
 }
@@ -244,6 +244,16 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     int size = sizeof(user_data_t);
     printf("now in generateDist");
     correlation(mass, dist, events, timeArray);
+
+    //create a file from the timeArray for debugging
+    char filename[sizeof "timeArray_CUDA.txt"];
+    sprintf(filename, "timeArray_CUDA.txt");
+    FILE *f = fopen(filename, "w+");
+    for(int i=0; i<(int)(1.3*REST); i++){
+        fprintf(f, "%e\n", timeArray[i]);
+    }
+    fclose(f);
+
     cudaMalloc(&d_mass, size); cudaMalloc(&d_dist, size);
     cudaMalloc(&d_distribution, (RESE-1) * REST * size);
     cudaMalloc(&d_triggerEffs, RESE*size);
@@ -260,7 +270,6 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     getEnergySpec<<<(REST + 511) / 512,512>>>(d_mass, d_dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
     //CudaCheckError();
 
-    // TODO: FIXME
     cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
 
     cudaFree(d_mass); cudaFree(d_dist); cudaFree(d_timeArray); cudaFree(d_distribution);

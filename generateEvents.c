@@ -68,6 +68,15 @@ void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distanc
 
     /*get trigger efficiencies as function of energy*/
     fillTriggerEff(triggerEffs, useTriggerEff);
+    //create a file from the triggerEff for debugging
+    char filename[sizeof "triggerEff_CUDA.txt"];
+    sprintf(filename, "triggerEff_CUDA.txt");
+    FILE *f = fopen(filename, "w+");
+    for(int i=0; i< RESE+1 ; i++){
+        fprintf(f, "%e\n", triggerEffs[i]);
+    }
+    fclose(f);
+
 
     /*create the spectrum from which the random events are drawn*/
     generateDist(mass, distance, events, spectrum, triggerEffs, useEnergyRes);
