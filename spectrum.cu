@@ -208,7 +208,7 @@ void getEnergySpec(user_data_t *mass, user_data_t *dist, user_data_t *timeArray,
         energySpectrum[0] = 0.0;
         for (e=1; e<RESE; e++){
             // make this explicit for now, until know how to call function correctly
-            time =  t*STEPT - (*dist)*51.4635*(*mass/e*STEPE)*(*mass/e*STEPE);//getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+            time =  t*STEPT - (*dist)*51.4635*(*mass/(e*STEPE))*(*mass/(e*STEPE));//getTimeDelay(t*STEPT, e*STEPE, mass, dist);
             arrayIndex = (int) (time/(STEPT) + 0.3*REST);
             if (arrayIndex <= 0)
                 arrayIndex = 0;
