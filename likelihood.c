@@ -18,33 +18,6 @@ BINNING: see spectrum.h
 
 #include "spectrum.h"
 
-/// get triggerEff
-void getTriggerEfficiency(double *triggerEfficiency, bool triggEff){
-        /*read in trigger efficiency*/
-    int i;
-    double triggerEnergy[RESE+1];
-    /* initialize with 1 in case triggerEfficiency is not used*/
-    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1);
-    if(triggEff){
-        FILE *myFile;
-        if (RESE==600){
-            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        }
-        else if (RESE==6000){
-            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
-        }
-        else if (RESE==60000){
-            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
-        }
-        else {
-            printf("Invalid grid size for the energy resolution.");
-        }
-        for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
-        }
-        fclose(myFile);
-    }
-}
 /// load event
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber){
 
@@ -68,13 +41,10 @@ double getLLH(double mass, double distance, double events, double *triggerEffici
     // generate spectrum for which LLH is calculated
     double *testSpectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
     generateDist(mass, distance, events, testSpectrum, triggerEfficiency, energyRes);
-    // add noise - do this earlier?
-    for (i=0; i<(RESE-1)*REST;i++){
-        testSpectrum[i] += noise;
-    }
+    addNoise(testSpectrum, noise);
     for (i = 0; i < events; i++){
         if (testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]] < pow(10,-200)){
-            llh += -10000000;   
+            llh += -10000000;
             printf("value of spectrum very small - check");
         }
         else llh += log(testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]]);
@@ -84,33 +54,10 @@ double getLLH(double mass, double distance, double events, double *triggerEffici
 }
 
 void calcLLH(double mass, double distance, double events, bool triggEff, bool energyRes, int filenumber, double noise){
-
-    /*read in trigger efficiency*/
     int i;
-    double triggerEnergy[RESE+1];
-    double triggerEfficiency[RESE+1];
-    /* initialize with 1 in case triggerEfficiency is not used*/
-    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1);
-    if(triggEff){
-        FILE *myFile;
-        if (RESE==600){
-            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        }
-        else if (RESE==6000){
-            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
-        }
-        else if (RESE==60000){
-            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
-        }
-        else {
-            printf("Invalid grid size for the energy resolution.");
-        }
-        for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
-        }
-        fclose(myFile);
-    }
-   
+    //double triggerEfficiency[RESE+1];
+    //getTriggerEfficiency(triggerEfficiency, triggEff);
+
     /*load events & store energy and time in arrays*/
     char filename[sizeof "1eV_ideal/eventsGenerated_1.34eV_10.5Mpc_1000Events_ideal_1111.txt"];
     if (triggEff && energyRes){
@@ -139,20 +86,16 @@ void calcLLH(double mass, double distance, double events, bool triggEff, bool en
     // first go over broad range - there are no negative entries in the spectrum!!!!!
     for (testMass = mass - 0.1; testMass <= mass + 0.6; testMass+=0.1){
         llh = 0.0;
-        generateDist(testMass, distance, events, testSpectrum, triggerEfficiency, energyRes);
-        // add noise
-        for (i=0; i<(RESE-1)*REST;i++){
-            testSpectrum[i] += noise;
-        }
+        createSpectrum(testSpectrum, testMass, distance, events, energyRes, triggEff, noise);
         for (i = 0; i < events; i++){
             if (testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]] < pow(10,-200)){
-                llh += -10000000;   
+                llh += -10000000;
             }
             else llh += log(testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]]);
             //printf("tset %d %f \n", i, llh);
         }
         llh*=-1;
-        printf("mass %f, llh %f\n",testMass, llh);
+        printf("mass %f, llh %f\n", testMass, llh);
         if (llh < minLLH) {
             minLLH = llh;
             massOfMinLLH = testMass;
@@ -164,14 +107,10 @@ void calcLLH(double mass, double distance, double events, bool triggEff, bool en
     for (testMass = currentMinimum - 0.09; testMass <= currentMinimum + 0.05; testMass += 0.01){
         if(testMass >= 0.0){
             llh = 0.0;
-            generateDist(testMass, distance, events, testSpectrum, triggerEfficiency, energyRes);
-            // add noise
-            for (i=0; i<(RESE-1)*REST;i++){
-                testSpectrum[i] += noise;
-            }
+            createSpectrum(testSpectrum, testMass, distance, events, energyRes, triggEff, noise);
             for (i = 0; i < events; i++){
                 if (testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]] < pow(10,-200)){
-                    llh += -10000000;   
+                    llh += -10000000;
                 }
                 else llh += log(testSpectrum[eventTime[i]*(RESE-1)+eventEnergy[i]]);
                 //printf("tset %d %f \n", i, llh);
@@ -204,7 +143,7 @@ void calcLLH(double mass, double distance, double events, bool triggEff, bool en
 }
 
 int main(void){
-	/*set parameters*/
+    /*set parameters*/
     /*flag for trigger efficiency*/
     bool triggEff = true;
     bool energyRes = true;
@@ -215,7 +154,7 @@ int main(void){
     double noise = pow(10,-5);
 
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<2; filenumber++){ 
+    for (filenumber=1; filenumber<2; filenumber++){
         printf("evaluating file %d \n", filenumber);
         calcLLH(mass, distance, events, triggEff, energyRes, filenumber, noise);
     }

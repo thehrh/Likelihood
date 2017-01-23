@@ -25,13 +25,13 @@ N is proportional to E -> N = 1/alpha*E -> N=alpha*E -> factor of alpha for sigm
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-double time_shift(double t, double E, double mass, double dist);
 double LLSpectrumTotal (double t, double E, double mass, double dist);
 void ProbFirstHitDist (double mass, double dist, double events, double *result);
 void correlation(double mass, double dist, double events, double *newSpec);
 void generateDist(double mass, double dist, double events, double *distribution, double *triggerEfficiency, bool energyRes);
 void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise);
 void getTriggerEfficiency(double *triggerEfficiency, bool triggEff);
+void addNoise(double *spectrum, double noise);
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
 double getLLH(double mass, double distance, double events, double *triggerEfficiency, bool energyRes, double noise, int *eventTime, int *eventEnergy);
 

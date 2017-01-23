@@ -183,14 +183,13 @@ void generateDist(double mass, double dist, double events, double *distribution,
 	normalize(distribution);
 }
 
-void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
-    /*read in trigger efficiency*/
+void getTriggerEfficiency(double *triggerEffs, bool useTriggerEff){
+    /*Read in trigger efficiency based on the chosen resolution (eff. vs. energy).
+     Note that the trigger efficiency file for the chosen resolution needs
+     to be located in the current directory.*/
     int i;
-    double triggerEnergy[RESE+1];
-    double triggerEfficiency[RESE+1];
-    /* initialize with 1 in case triggerEfficiency is not used*/
-    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1.0);
-    if(triggEff){
+    double triggerEns[RESE+1]; // TODO: why do we need this at all?
+    if(useTriggerEff){
         FILE *myFile;
         if (RESE==600){
             myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
@@ -205,16 +204,32 @@ void createSpectrum(double *spectrum, double mass, double distance, double event
             printf("Invalid grid size for the energy resolution.");
         }
         for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
+            fscanf(myFile, "%lf %lf", &triggerEns[i], &triggerEffs[i]);
         }
         fclose(myFile);
     }
+    else{
+        /* initialize with 1s for ideal trigger efficiency */
+        for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+    }
+}
 
-    /*create the spectrum from which the random events are drawn*/
-	generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
-    // add noise to the spectrum
-    for (i=0; i<(RESE-1)*REST;i++){
+void addNoise(double *spectrum, double noise){
+    int i;
+    // add constant noise floor to the spectrum
+    for (i=0; i<(RESE-1)*REST; i++){
+        //spectrum[i] *= 0.99;
         spectrum[i] += noise;
     }
+}
+
+void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
+    double triggerEfficiency[RESE+1];
+
+    getTriggerEfficiency(triggerEfficiency, triggEff);
+
+    generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
+
+    addNoise(spectrum, noise);
 }
 

@@ -23,66 +23,6 @@ generate random events for: E=0.1-60.0 0.1
                             t=0.0-10.0 0.001
 */
 
-void fillTriggerEff(double *triggerEffs, bool useTriggerEff){
-    /*Read in trigger efficiency based on the chosen resolution (eff. vs. energy).
-     Note that the trigger efficiency file for the chosen resolution needs
-     to be located in the current directory.*/
-    int i;
-    double triggerEns[RESE+1]; // TODO: why do we need this at all?
-    if(useTriggerEff){
-        FILE *myFile;
-        if (RESE==600){
-            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        }
-        else if (RESE==6000){
-            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
-        }
-        else if (RESE==60000){
-            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
-        }
-        else {
-            printf("Invalid grid size for the energy resolution.");
-        }
-        for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEns[i], &triggerEffs[i]);
-        }
-        fclose(myFile);
-    }
-    else{
-        /* initialize with 1s for ideal trigger efficiency */
-        for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
-    }
-}
-
-void addNoise(double *spectrum, double noise){
-    int i;
-    // add constant noise floor to the spectrum
-    for (i=0; i<(RESE-1)*REST; i++){
-        //spectrum[i] *= 0.99;
-        spectrum[i] += noise;
-    }
-}
-
-void createSpectrum(double *spectrum, double mass, double distance, double events, bool useEnergyRes, bool useTriggerEff, double noise){
-    double triggerEffs[RESE+1];
-
-    /*get trigger efficiencies as function of energy*/
-    fillTriggerEff(triggerEffs, useTriggerEff);
-
-    /*create the spectrum from which the random events are drawn*/
-    generateDist(mass, distance, events, spectrum, triggerEffs, useEnergyRes);
-
-    /*sprinkle with some noise*/
-    addNoise(spectrum, noise);
-
-    /*double testsum = 0.0;
-    for (i=0; i<(RESE-1)*REST;i++){
-        testsum += spectrum[i]*(1/(REST*0.1))*(1/(RESE/60.0));
-    }
-    printf("testsum %f \n", testsum);*/
-}
-
-
 void createEvents(double mass, double distance, double events, bool triggEff, bool energyRes, int filenumber, double *spectrum, double max){
 
     /*storing time & energy in file*/
