@@ -268,9 +268,20 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     cudaMemcpy(d_distribution, &distribution, (RESE-1) * REST * size, cudaMemcpyHostToDevice);
 
     getEnergySpec<<<(REST + 511) / 512,512>>>(d_mass, d_dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
+    //getEnergySpec<<<REST, 1>>>(d_mass, d_dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
     //CudaCheckError();
 
     cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
+
+    //create a file from the dist before norm
+    char filename2[sizeof "spec_before_norm_CUDA.txt"];
+    sprintf(filename2, "spec_before_norm_CUDA.txt");
+    FILE *f2 = fopen(filename2, "w+");
+    for(int i=0; i<(RESE-1)*REST; i++){
+        fprintf(f2, "%e\n", distribution[i]);
+    }
+    fclose(f2);
+
 
     cudaFree(d_mass); cudaFree(d_dist); cudaFree(d_timeArray); cudaFree(d_distribution);
     cudaFree(d_triggerEffs);// cudaFree(d_useEnergyRes);
