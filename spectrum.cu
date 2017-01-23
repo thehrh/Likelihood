@@ -67,17 +67,17 @@ inline void __cudaCheckError( const char *file, const int line )
 
 
 /* time shift due to neutrino mass */
-double getDeltaT(double E, float mass, float dist){
-    double tDelta = dist*51.4635*(mass/E)*(mass/E);
+user_data_t getDeltaT(user_data_t E, user_data_t mass, user_data_t dist){
+    user_data_t tDelta = dist*51.4635*(mass/E)*(mass/E);
     return tDelta;
 }
 
-double getTimeDelay(double t, double E, float mass, float dist){
+user_data_t getTimeDelay(user_data_t t, user_data_t E, user_data_t mass, user_data_t dist){
     return t - getDeltaT(E, mass, dist);
 }
 
-double LL_time_spectrum_shifted(double t, double E, float mass, float dist){
-    double time = getTimeDelay(t, E, mass, dist);
+user_data_t LL_time_spectrum_shifted(user_data_t t, user_data_t E, user_data_t mass, user_data_t dist){
+    user_data_t time = getTimeDelay(t, E, mass, dist);
     if (time <= 0){
         // unphysical?
         return 0.0;
@@ -86,14 +86,14 @@ double LL_time_spectrum_shifted(double t, double E, float mass, float dist){
 }
 
 /* arrival time probability for a certain mass/distance - normalized */
-double LLSpectrumTotal (double t, double E, float mass, float dist){
+user_data_t LLSpectrumTotal (user_data_t t, user_data_t E, user_data_t mass, user_data_t dist){
     return LL_time_spectrum_shifted(t, E, mass, dist)*LL_energy_spectrum(E);
 }
 
-void cumSumT(float *arrayToSum, float *cumulative){
+void cumSumT(user_data_t *arrayToSum, user_data_t *cumulative){
     /*calculate the cumulative sum of the arrival time distribution*/
     int k, l;
-    float cum;
+    user_data_t cum;
     for (k = 0; k < REST; k++){
         cum = 0.0;
         for (l = 0; l <= k; l++){
@@ -103,9 +103,9 @@ void cumSumT(float *arrayToSum, float *cumulative){
     }
 }
 
-void firstHitDistWeightedArrivalTimeDist(float *arrivalTimeDist, float *cumulative, double events, float *result){
+void firstHitDistWeightedArrivalTimeDist(user_data_t *arrivalTimeDist, user_data_t *cumulative, user_data_t events, user_data_t *result){
     int m;
-    float count = 0.0;
+    user_data_t count = 0.0;
     for (m = 0; m < REST; m++){
         result[m] = arrivalTimeDist[m]*events*pow((1 - cumulative[m]), events-1);
         count += result[m];
@@ -116,13 +116,13 @@ void firstHitDistWeightedArrivalTimeDist(float *arrivalTimeDist, float *cumulati
 }
 
 /* calculate the probability to get the first hit after a certain amount of time */
-void ProbFirstHitDist (float mass, float dist, double events, float *result){
+void ProbFirstHitDist (user_data_t mass, user_data_t dist, user_data_t events, user_data_t *result){
     /*arrival time distribution of all the hits (for a certain mass) - project the E,t spectrum
     on the t axis - t in 0.01 steps from 0 to 10 seconds*/
-    float totalArrivalTimeDist[REST];
+    user_data_t totalArrivalTimeDist[REST];
     int i;
-    float sum;
-    float y, e;
+    user_data_t sum;
+    user_data_t y, e;
     for (i = 0; i < REST; i++){
         /* set the sum to zero for each time bin */
         sum = 0.0;
@@ -137,15 +137,15 @@ void ProbFirstHitDist (float mass, float dist, double events, float *result){
         totalArrivalTimeDist[i] = sum*STEPT;
     }
 
-    float cumulative[REST];
+    user_data_t cumulative[REST];
     cumSumT(totalArrivalTimeDist, cumulative);
 
     firstHitDistWeightedArrivalTimeDist(totalArrivalTimeDist, cumulative, events, result);
 }
 
-void convolveHitDistWithLLTimeSpec(float *hitDist, float *convolSpec){
+void convolveHitDistWithLLTimeSpec(user_data_t *hitDist, user_data_t *convolSpec){
     int i, j;
-    float pNew;
+    user_data_t pNew;
     /*perform the convolution*/
     for (i = 0; i < REST*1.3; i++){
         pNew = 0.0;
@@ -161,16 +161,16 @@ void convolveHitDistWithLLTimeSpec(float *hitDist, float *convolSpec){
 /*calculate the correlation - new spectrum between -3 and 10s*/
 /*this is stored in an array so newSpec[0] corresponds to a time of -3s
 and newSpec[1.3*REST-1] to 10s*/
-void correlation(float mass, float dist, double events, float *newSpec){
-    float hitDist[REST];
+void correlation(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec){
+    user_data_t hitDist[REST];
     ProbFirstHitDist(mass, dist, events, hitDist);
     convolveHitDistWithLLTimeSpec(hitDist, newSpec);
 }
 
-void applyEnergyRes(int t, float *distribution, float *energySpectrum){
+void applyEnergyRes(int t, user_data_t *distribution, user_data_t *energySpectrum){
     int f, g;
     for (f=1; f<RESE; f+=1){
-        float pNew = 0.0;
+        user_data_t pNew = 0.0;
         for (g=-RESE; g<RESE+1; g+=5){
             if (f-g >= 0 && f-g <= RESE){
                 pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
@@ -181,10 +181,10 @@ void applyEnergyRes(int t, float *distribution, float *energySpectrum){
 }
 
 
-void normalize(float *distribution){
+void normalize(user_data_t *distribution){
 	// normalize the spectrum to 1
 	int k;
-	float normalize = 0;
+	user_data_t normalize = 0;
 
 	for (k=0; k<(RESE-1)*REST; k++){
 		normalize += distribution[k]*STEPT*STEPE;
@@ -197,14 +197,14 @@ void normalize(float *distribution){
 
 
 __global__
-void getEnergySpec(float *mass, float *dist, float *timeArray, float *triggerEffs, float *distribution, bool useEnergyRes){
+void getEnergySpec(user_data_t *mass, user_data_t *dist, user_data_t *timeArray, user_data_t *triggerEffs, user_data_t *distribution, bool useEnergyRes){
     //TODO: solve memory issue with "distribution"
-    float time, pUnsmeared, pNew;
+    user_data_t time, pUnsmeared, pNew;
     int e, f, g, arrayIndex;
 
     int t = blockIdx.x*blockDim.x + threadIdx.x;
     if (t < REST){
-        float energySpectrum[RESE];
+        user_data_t energySpectrum[RESE];
         energySpectrum[0] = 0.0;
         for (e=1; e<RESE; e++){
             // make this explicit for now, until know how to call function correctly
@@ -235,13 +235,13 @@ void getEnergySpec(float *mass, float *dist, float *timeArray, float *triggerEff
     }	
 }
 
-void generateDist(float mass, float dist, double events, float *distribution, float *triggerEffs, bool useEnergyRes){
-    float *d_timeArray;
-    float timeArray[(int) (1.3*REST)];
+void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes){
+    user_data_t *d_timeArray;
+    user_data_t timeArray[(int) (1.3*REST)];
 
-    float *d_mass, *d_dist, *d_triggerEffs, *d_distribution;
+    user_data_t *d_mass, *d_dist, *d_triggerEffs, *d_distribution;
     //bool *d_useEnergyRes;
-    int size = sizeof(float);
+    int size = sizeof(user_data_t);
     printf("now in generateDist");
     correlation(mass, dist, events, timeArray);
     cudaMalloc(&d_mass, size); cudaMalloc(&d_dist, size);

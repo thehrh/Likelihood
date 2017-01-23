@@ -10,6 +10,12 @@
 #define STEPE EMAX/RESE
 #define STEPT TMAX/REST
 
+#ifdef USE_SP
+typedef float user_data_t;
+#else
+typedef double user_data_t;
+#endif
+
 /* normalized LL energy spectrum - 15.4 average energy, 3.8: betha, 4802: normalization factor*/
 #define LL_energy_spectrum(E) pow(E, 3.8)*exp(-(1.0+3.8)*E/15.4)/4802.516160
 /* normalized LL arrival time spectrum - approximated by log-normal-dist */
@@ -22,10 +28,10 @@
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-double time_shift(double t, double E, float mass, float dist);
-double LLSpectrumTotal (double t, double E, float mass, float dist);
-void ProbFirstHitDist (float mass, float dist, double events, float *result);
-void correlation(float mass, float dist, double events, float *newSpec);
-void generateDist(float mass, float dist, double events, float *distribution, float *triggerEffs, bool useEnergyRes);
+user_data_t time_shift(user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
+user_data_t LLSpectrumTotal (user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
+void ProbFirstHitDist (user_data_t mass, user_data_t dist, user_data_t events, user_data_t *result);
+void correlation(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec);
+void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes);
 
 #endif
