@@ -153,8 +153,8 @@ void convolveHitDistWithLLTimeSpec(user_data_t *hitDist, user_data_t *convolSpec
             if ((i-0.3*REST + j) < REST && (i-0.3*REST + j) > 0){
                 pNew += hitDist[j] * LL_time_spectrum( (j+i-0.3*REST)*STEPT );
             }
-        convolSpec[i] = pNew;
         }
+        convolSpec[i] = pNew;
     }
 }
 
