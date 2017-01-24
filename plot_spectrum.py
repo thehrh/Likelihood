@@ -18,7 +18,7 @@ from matplotlib.colors import LogNorm
 spectrum_plot = spectrum.doubleArray(599000)
 
 # array, mass, distance, #of events, bool energyRes, bool triggerEff, noise
-spectrum.createSpectrum(spectrum_plot,1.0, 1.0,  160,True, True,pow(10,-5))
+spectrum.createSpectrum(spectrum_plot,1.0, 5.0,  10,True, True,pow(10,-5))
 
 myArray = [[spectrum_plot[t*(599) +e] for t in range(0, 1000, 1)] for e in range(1, 590)]
 

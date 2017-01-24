@@ -36,7 +36,7 @@ void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, do
 ///function that calculates likelihood - and will then be minimized in python
 double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy){
 
-    double llh;
+    double llh = 0.0;
     int i;
     user_data_t spectrum[(RESE-1)*REST];
 	//double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
@@ -68,7 +68,7 @@ void calcLLH(double mass, double distance, double events, bool triggEff, bool en
     double testMass;
     // store current value of the minimumLLH and the corresponding mass
     double minLLH = INFINITY;
-    double massOfMinLLH;
+    double massOfMinLLH = 0.0;
     // go over all the spectra around a certain range of the input mass & calculate the likelihood for each spectrum
     double *testSpectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
     // first go over broad range - there are no negative entries in the spectrum!!!!!
@@ -141,7 +141,7 @@ int main(void){
     double noise = pow(10,-5);
 
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<100; filenumber++){ 
+    for (filenumber=1; filenumber<1; filenumber++){ 
         printf("evaluating file %d \n", filenumber);
         calcLLH(mass, distance, events, triggEff, energyRes, filenumber, noise);
     }

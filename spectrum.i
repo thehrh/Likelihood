@@ -12,12 +12,15 @@
 #include "spectrum.h"
 %}
 
-double time_shift(double t, double E, double mass, double dist);
-double LLSpectrumTotal (double t, double E, double mass, double dist);
-void ProbFirstHitDist (double mass, double dist, double events, double *result);
-void correlation(double mass, double dist, double events, double *newSpec);
-void generateDist(double mass, double dist, double events, double *distribution, double *triggerEfficiency, bool energyRes);
-void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise);
-void getTriggerEfficiency(double *triggerEfficiency, bool triggEff);
+#ifdef USE_SP
+typedef float user_data_t;
+#else
+typedef double user_data_t;
+#endif
+
+void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise);
+
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
-double getLLH(double mass, double distance, double events, double *triggerEfficiency, bool energyRes, double noise, int *eventTime, int *eventEnergy);
+double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy);
+
+

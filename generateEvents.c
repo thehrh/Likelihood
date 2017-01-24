@@ -79,8 +79,6 @@ int main(void){
     double noise_rate = pow(10,-3); //Hz, expected noise rate
     // noise that has to be added to each bin:
     user_data_t noise = noise_rate*STEPT;
-    printf("test %f \n", noise);
-    user_data_t max;
     
     // generate spectrum from whicht time/energy events are drawn
     user_data_t spectrum[(RESE-1)*REST];
@@ -101,7 +99,7 @@ int main(void){
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<2; filenumber++){ 
+    for (filenumber=1; filenumber<1; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }

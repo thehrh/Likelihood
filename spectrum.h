@@ -31,15 +31,9 @@ N is proportional to E -> N = 1/alpha*E -> N=alpha*E -> factor of alpha for sigm
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-user_data_t time_shift(user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
-user_data_t LLSpectrumTotal (user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
-void ProbFirstHitDist (user_data_t mass, user_data_t dist, user_data_t events, user_data_t *result);
-void correlation(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec);
-void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes);
-void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool energyRes, bool triggEff, user_data_t noise);
-/*
-void getTriggerEfficiency(double *triggerEfficiency, bool triggEff);
+void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise);
+
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
-double getLLH(double mass, double distance, double events, double *triggerEfficiency, bool energyRes, double noise, int *eventTime, int *eventEnergy);
-*/
+double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy);
+
 #endif 
