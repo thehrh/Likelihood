@@ -23,55 +23,12 @@ generate random events for: E=0.1-60.0 0.1
                             t=0.0-10.0 0.001
 */
 
-/*
-void createSpectrum(double *spectrum, double mass, double distance, double events, bool energyRes, bool triggEff, double noise){
-    /*read in trigger efficiency
-    int i;
-    double triggerEnergy[RESE+1];
-    double triggerEfficiency[RESE+1];
-    /* initialize with 1 in case triggerEfficiency is not used
-    for(i = 0; i < RESE+1 ; triggerEfficiency[i++] = 1.0);
-    if(triggEff){
-        FILE *myFile;
-        if (RESE==600){
-            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        }
-        else if (RESE==6000){
-            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
-        }
-        else if (RESE==60000){
-            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
-        }
-        else {
-            printf("Invalid grid size for the energy resolution.");
-        }
-        for (i = 0; i < RESE+1; i++) {
-            fscanf(myFile, "%lf %lf", &triggerEnergy[i], &triggerEfficiency[i]);
-        }
-        fclose(myFile);
-    }
-
-    /*create the spectrum from which the random events are drawn
-	generateDist(mass, distance, events, spectrum, triggerEfficiency, energyRes);
-    // add noise to the spectrum
-    for (i=0; i<(RESE-1)*REST;i++){
-        //spectrum[i] *= 0.99;
-        spectrum[i] += noise;
-    }
-    /*double testsum = 0.0;
-    for (i=0; i<(RESE-1)*REST;i++){
-        testsum += spectrum[i]*(1/(REST*0.1))*(1/(RESE/60.0));
-    }
-    printf("testsum %f \n", testsum);
-}
-*/
-
-void createEvents(double mass, double distance, double events, bool triggEff, bool energyRes, int filenumber, double *spectrum, double max){
+void createEvents(user_data_t mass, user_data_t distance, user_data_t events, bool triggEff, bool energyRes, int filenumber, user_data_t *spectrum, user_data_t max){
 
     /*storing time & energy in file*/
     char filename[sizeof "1.5eV_ideal/eventsGenerated_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
     if (triggEff && energyRes){
-        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
+        sprintf(filename, "TEST/events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
     }
     else {
         sprintf(filename, "%.1feV_ideal_test3/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, mass, distance, events, filenumber);
@@ -84,7 +41,7 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
 
     int eventsGenerated = 0;
     int randE, randT;
-    double randCheck;
+    user_data_t randCheck;
     while(eventsGenerated < events){
         randE = rand() % (RESE);
         randT = rand() % (REST);
@@ -99,44 +56,57 @@ void createEvents(double mass, double distance, double events, bool triggEff, bo
     
 }
 
+
+user_data_t findSpectrumMax(user_data_t *spectrum){
+    // find the maximum value in the spectrum - needed to draw random events
+    user_data_t max = 0.0;
+    int i;
+    for(i=0; i<((RESE-1)*REST); i++){
+        if(spectrum[i]>max) max = spectrum[i];
+    }
+    return max;
+}
+
 int main(void){
 	/*set parameters*/
     /*flag for trigger efficiency*/
     bool triggEff = true;
     bool energyRes = true;
-    double mass = 1.0;
-    double distance = 5.0;
-    double events = 10.0;
+    user_data_t mass = 1.0;
+    user_data_t distance = 1.0;
+    user_data_t events = 160.0;
     int filenumber, i;
-    double noise = pow(10,-5);
+    double noise_rate = pow(10,-3); //Hz, expected noise rate
+    // noise that has to be added to each bin:
+    user_data_t noise = noise_rate*STEPT;
+    printf("test %f \n", noise);
+    user_data_t max;
     
     // generate spectrum from whicht time/energy events are drawn
-	double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
+    user_data_t spectrum[(RESE-1)*REST];
+	//double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
     createSpectrum(spectrum, mass, distance, events, energyRes, triggEff, noise);
 
     /*create a file from the spectrum that can then be ploted to look at the spectrum*/
     char filename[sizeof "spectrum_0.1eV_1Mpc_160events_test.txt"];
-    sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents.txt",mass, distance, events);
+    sprintf(filename, "spectrum_%.2feV_%.3fMpc_%.0fevents_test.txt",mass, distance, events);
     FILE *f = fopen(filename, "w+");
     for(i=0; i<((RESE-1)*REST);i++){
         fprintf(f, "%e\n", spectrum[i]);
     }
     fclose(f);
 
-    // find the maximum value in the spectrum - needed to draw random events
-    double max = 0.0;
-    for(i=0; i<((RESE-1)*REST);i++){
-        if(spectrum[i]>max) max = spectrum[i];
-    }
+    max = findSpectrumMax(spectrum);
+
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<1; filenumber++){ 
+    for (filenumber=1; filenumber<100; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }
 
-    free(spectrum);
+    //free(spectrum);
     printf("DONE\n");
     return 0;
 }
