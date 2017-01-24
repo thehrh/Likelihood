@@ -28,7 +28,7 @@ void createEvents(user_data_t mass, user_data_t distance, user_data_t events, bo
     /*storing time & energy in file*/
     char filename[sizeof "1.5eV_ideal/eventsGenerated_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
     if (triggEff && energyRes){
-        sprintf(filename, "TEST/events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
+        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
     }
     else {
         sprintf(filename, "%.1feV_ideal_test3/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d.txt", mass, mass, distance, events, filenumber);
@@ -101,7 +101,7 @@ int main(void){
 
     srand( (unsigned)time( NULL ) );
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<100; filenumber++){ 
+    for (filenumber=1; filenumber<2; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }
