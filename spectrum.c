@@ -20,16 +20,19 @@ noise of the detector: 1mHz
 
 #include "spectrum.h"
 
+//no RESE
 double getDeltaT(double E, double mass, double dist){
     /* time shift due to neutrino mass - factor of 51.4 to get the proper units*/
     double tDelta = dist*51.4635*(mass/E)*(mass/E);
     return tDelta;
 }
 
+//no RESE
 double getTimeDelay(double t, double E, double mass, double dist){
     return t - getDeltaT(E, mass, dist);
 }
 
+//no RESE
 double LL_time_spectrum_shifted(double t, double E, double mass, double dist){
     /* retrun the value of the LL time spectrum at the shifted time*/
     double time = getTimeDelay(t, E, mass, dist);
@@ -40,11 +43,13 @@ double LL_time_spectrum_shifted(double t, double E, double mass, double dist){
     return LL_time_spectrum(time);
 }
 
+//no RESE
 double LLSpectrumTotal(double t, double E, double mass, double dist){
     /* 2D arrival time/energy probability for a certain mass/distance - normalized */
     return LL_time_spectrum_shifted(t, E, mass, dist)*LL_energy_spectrum(E);
 }
 
+//no RESE
 void cumSumT(double *arrayToSum, double *cumulative){
     /*calculate the cumulative sum of an array*/
     int k, l;
@@ -58,6 +63,7 @@ void cumSumT(double *arrayToSum, double *cumulative){
     }
 }
 
+//no RESE
 void firstHitDistWeightedArrivalTimeDist(double *arrivalTimeDist, double *cumulative, double events, double *result){
     /*calculate the 1st Hit Distribution - and normalize it*/
     int m;
@@ -71,6 +77,7 @@ void firstHitDistWeightedArrivalTimeDist(double *arrivalTimeDist, double *cumula
     }
 }
 
+//no RESE
 /* calculate the probability to get the first hit after a certain amount of time */
 void ProbFirstHitDist (double mass, double dist, double events, double *result){
     /*arrival time distribution of all the hits (for a certain mass) - project the E,t spectrum
@@ -99,6 +106,7 @@ void ProbFirstHitDist (double mass, double dist, double events, double *result){
     firstHitDistWeightedArrivalTimeDist(totalArrivalTimeDist, cumulative, events, result);
 }
 
+//no RESE
 void convolveHitDistWithLLTimeSpec(double *hitDist, double *convolSpec){
     int i, j;
     double pNew;
@@ -114,6 +122,7 @@ void convolveHitDistWithLLTimeSpec(double *hitDist, double *convolSpec){
     }
 }
 
+// no RESE
 /*calculate the correlation - new spectrum between -3 and 10s*/
 /*this is stored in an array so newSpec[0] corresponds to a time of -3s 
 and newSpec[1.3*REST-1] to 10s*/
@@ -123,7 +132,7 @@ void correlation(double mass, double dist, double events, double *newSpec){
     convolveHitDistWithLLTimeSpec(hitDist, newSpec);
 }
 
-
+// RESE - maybe broader range for RESE - check energySpectrum
 void applyEnergyRes(int t, double *distribution, double *energySpectrum){
     /*smear the energy spectrum by convoluting with a gaussian*/
     int f, g;
@@ -151,7 +160,7 @@ void getEnergySpec(double mass, double dist, double *timeArray, double *distribu
             if (arrayIndex <= 0){
                 arrayIndex = 0;
             }
-            pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+            pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[(int) (e*STEPE*10)];
             if (!useEnergyRes){
                 distribution[t*(RESE-1) +e-1] = pUnsmeared;
             }
@@ -192,18 +201,21 @@ void fillTriggerEff(user_data_t *triggerEffs, bool useTriggerEff){
      Note that the trigger efficiency file for the chosen resolution needs
      to be located in the current directory.*/
     int i;
-    user_data_t triggerEns[RESE+1]; // TODO: why do we need this at all?
+    //c // TODO: why do we need this at all?
+    user_data_t triggerEns[601];
     if(useTriggerEff){
         FILE *myFile;
         myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        for (i = 0; i < RESE+1; i++) {
+        //for (i = 0; i < RESE+1; i++) {
+        for (i = 0; i < 601; i++) {
             fscanf(myFile, "%lf %lf", &triggerEns[i], &triggerEffs[i]);
         }
         fclose(myFile);
     }
     else{
         /* initialize with 1s for ideal trigger efficiency */
-        for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+        //for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+        for(i = 0; i < 601 ; triggerEffs[i++] = 1.0);
     }
 }
 
@@ -217,7 +229,8 @@ void addNoise(user_data_t *spectrum, user_data_t noise){
 
 
 void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise){
-    user_data_t triggerEffs[RESE+1];
+    //user_data_t triggerEffs[RESE+1];
+    user_data_t triggerEffs[601];
 
     /*get trigger efficiencies as function of energy*/
     fillTriggerEff(triggerEffs, useTriggerEff);
