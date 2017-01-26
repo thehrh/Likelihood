@@ -1,5 +1,4 @@
-/* File: spectrum.i */
-
+/* File needed for SWIG to build the python module "spectrum" */
 
 %module spectrum
 
@@ -22,5 +21,3 @@ void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distanc
 
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
 double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy);
-
-
