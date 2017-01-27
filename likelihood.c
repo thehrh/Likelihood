@@ -23,7 +23,7 @@ void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, do
 
     /*load events & store energy and time in arrays*/
     char filename[sizeof "1eV_ideal/eventsGenerated_1.34eV_10.5Mpc_1000Events_ideal_1111.txt"];
-    sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_real_%d.txt", mass, distance, events, filenumber);
+    sprintf(filename, filename, "%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
 
     FILE *f = fopen(filename, "r");
     int i;
