@@ -1,0 +1,111 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 93.44      3.92     3.92     1000     0.00     0.00  applyEnergyRes(int, double*, double*)
+  2.15      4.01     0.09  6599000     0.00     0.00  getDeltaT(double, double, double)
+  1.67      4.08     0.07  6000000     0.00     0.00  LL_time_spectrum_shifted(double, double, double, double)
+  0.96      4.12     0.04        1     0.04     0.24  ProbFirstHitDist(double, double, double, double*)
+  0.72      4.15     0.03  6599000     0.00     0.00  getTimeDelay(double, double, double, double)
+  0.48      4.17     0.02  6000000     0.00     0.00  LLSpectrumTotal(double, double, double, double)
+  0.48      4.19     0.02        1     0.02     0.02  convolveHitDistWithLLTimeSpec(double*, double*)
+  0.24      4.20     0.01        1     0.01     0.01  normalize(double*)
+  0.00      4.20     0.00        1     0.00     0.26  correlation(double, double, double, double*)
+  0.00      4.20     0.00        1     0.00     4.20  generateDist(double, double, double, double*, double*, bool)
+  0.00      4.20     0.00        1     0.00     3.93  getEnergySpec(double, double, double*, double*, double*, bool)
+  0.00      4.20     0.00        1     0.00     4.20  createSpectrum(double*, double, double, double, bool, bool, double)
+  0.00      4.20     0.00        1     0.00     0.00  fillTriggerEff(double*, bool)
+  0.00      4.20     0.00        1     0.00     0.00  findSpectrumMax(double*)
+  0.00      4.20     0.00        1     0.00     0.00  firstHitDistWeightedArrivalTimeDist(double*, double*, double, double*)
+  0.00      4.20     0.00        1     0.00     0.00  cumSumT(double*, double*)
+  0.00      4.20     0.00        1     0.00     0.00  addNoise(double*, double)
+
+			Call graph
+
+
+granularity: each sample hit covers 2 byte(s) for 0.24% of 4.20 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]    100.0    0.00    4.20                 main [1]
+                0.00    4.20       1/1           createSpectrum(double*, double, double, double, bool, bool, double) [3]
+                0.00    0.00       1/1           findSpectrumMax(double*) [21]
+-----------------------------------------------
+                0.00    4.20       1/1           createSpectrum(double*, double, double, double, bool, bool, double) [3]
+[2]    100.0    0.00    4.20       1         generateDist(double, double, double, double*, double*, bool) [2]
+                0.00    3.93       1/1           getEnergySpec(double, double, double*, double*, double*, bool) [4]
+                0.00    0.26       1/1           correlation(double, double, double, double*) [6]
+                0.01    0.00       1/1           normalize(double*) [13]
+-----------------------------------------------
+                0.00    4.20       1/1           main [1]
+[3]    100.0    0.00    4.20       1         createSpectrum(double*, double, double, double, bool, bool, double) [3]
+                0.00    4.20       1/1           generateDist(double, double, double, double*, double*, bool) [2]
+                0.00    0.00       1/1           fillTriggerEff(double*, bool) [20]
+                0.00    0.00       1/1           addNoise(double*, double) [24]
+-----------------------------------------------
+                0.00    3.93       1/1           generateDist(double, double, double, double*, double*, bool) [2]
+[4]     93.6    0.00    3.93       1         getEnergySpec(double, double, double*, double*, double*, bool) [4]
+                3.92    0.00    1000/1000        applyEnergyRes(int, double*, double*) [5]
+                0.00    0.01  599000/6599000     getTimeDelay(double, double, double, double) [10]
+-----------------------------------------------
+                3.92    0.00    1000/1000        getEnergySpec(double, double, double*, double*, double*, bool) [4]
+[5]     93.3    3.92    0.00    1000         applyEnergyRes(int, double*, double*) [5]
+-----------------------------------------------
+                0.00    0.26       1/1           generateDist(double, double, double, double*, double*, bool) [2]
+[6]      6.2    0.00    0.26       1         correlation(double, double, double, double*) [6]
+                0.04    0.20       1/1           ProbFirstHitDist(double, double, double, double*) [7]
+                0.02    0.00       1/1           convolveHitDistWithLLTimeSpec(double*, double*) [12]
+-----------------------------------------------
+                0.04    0.20       1/1           correlation(double, double, double, double*) [6]
+[7]      5.7    0.04    0.20       1         ProbFirstHitDist(double, double, double, double*) [7]
+                0.02    0.18 6000000/6000000     LLSpectrumTotal(double, double, double, double) [8]
+                0.00    0.00       1/1           cumSumT(double*, double*) [23]
+                0.00    0.00       1/1           firstHitDistWeightedArrivalTimeDist(double*, double*, double, double*) [22]
+-----------------------------------------------
+                0.02    0.18 6000000/6000000     ProbFirstHitDist(double, double, double, double*) [7]
+[8]      4.8    0.02    0.18 6000000         LLSpectrumTotal(double, double, double, double) [8]
+                0.07    0.11 6000000/6000000     LL_time_spectrum_shifted(double, double, double, double) [9]
+-----------------------------------------------
+                0.07    0.11 6000000/6000000     LLSpectrumTotal(double, double, double, double) [8]
+[9]      4.3    0.07    0.11 6000000         LL_time_spectrum_shifted(double, double, double, double) [9]
+                0.03    0.08 6000000/6599000     getTimeDelay(double, double, double, double) [10]
+-----------------------------------------------
+                0.00    0.01  599000/6599000     getEnergySpec(double, double, double*, double*, double*, bool) [4]
+                0.03    0.08 6000000/6599000     LL_time_spectrum_shifted(double, double, double, double) [9]
+[10]     2.9    0.03    0.09 6599000         getTimeDelay(double, double, double, double) [10]
+                0.09    0.00 6599000/6599000     getDeltaT(double, double, double) [11]
+-----------------------------------------------
+                0.09    0.00 6599000/6599000     getTimeDelay(double, double, double, double) [10]
+[11]     2.1    0.09    0.00 6599000         getDeltaT(double, double, double) [11]
+-----------------------------------------------
+                0.02    0.00       1/1           correlation(double, double, double, double*) [6]
+[12]     0.5    0.02    0.00       1         convolveHitDistWithLLTimeSpec(double*, double*) [12]
+-----------------------------------------------
+                0.01    0.00       1/1           generateDist(double, double, double, double*, double*, bool) [2]
+[13]     0.2    0.01    0.00       1         normalize(double*) [13]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum(double*, double, double, double, bool, bool, double) [3]
+[20]     0.0    0.00    0.00       1         fillTriggerEff(double*, bool) [20]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[21]     0.0    0.00    0.00       1         findSpectrumMax(double*) [21]
+-----------------------------------------------
+                0.00    0.00       1/1           ProbFirstHitDist(double, double, double, double*) [7]
+[22]     0.0    0.00    0.00       1         firstHitDistWeightedArrivalTimeDist(double*, double*, double, double*) [22]
+-----------------------------------------------
+                0.00    0.00       1/1           ProbFirstHitDist(double, double, double, double*) [7]
+[23]     0.0    0.00    0.00       1         cumSumT(double*, double*) [23]
+-----------------------------------------------
+                0.00    0.00       1/1           createSpectrum(double*, double, double, double, bool, bool, double) [3]
+[24]     0.0    0.00    0.00       1         addNoise(double*, double) [24]
+-----------------------------------------------
+
+Index by function name
+
+   [6] correlation(double, double, double, double*) [20] fillTriggerEff(double*, bool) [22] firstHitDistWeightedArrivalTimeDist(double*, double*, double, double*)
+   [2] generateDist(double, double, double, double*, double*, bool) [8] LLSpectrumTotal(double, double, double, double) [23] cumSumT(double*, double*)
+  [10] getTimeDelay(double, double, double, double) [21] findSpectrumMax(double*) [24] addNoise(double*, double)
+   [4] getEnergySpec(double, double, double*, double*, double*, bool) [7] ProbFirstHitDist(double, double, double, double*) [11] getDeltaT(double, double, double)
+   [5] applyEnergyRes(int, double*, double*) [9] LL_time_spectrum_shifted(double, double, double, double) [13] normalize(double*)
+   [3] createSpectrum(double*, double, double, double, bool, bool, double) [12] convolveHitDistWithLLTimeSpec(double*, double*)

@@ -1,0 +1,12 @@
+==14509== NVPROF is profiling process 14509, command: ./generateEvents
+==14509== Profiling application: ./generateEvents
+==14509== Profiling result:
+   Start  Duration            Grid Size      Block Size     Regs*    SSMem*    DSMem*      Size  Throughput           Device   Context    Stream  Name
+358.95ms  2.7200us                    -               -         -         -         -  10.156KB  3.5609GB/s  GeForce GTX 750         1         7  [CUDA memcpy HtoD]
+358.97ms  1.2480us                    -               -         -         -         -  4.6953KB  3.5880GB/s  GeForce GTX 750         1         7  [CUDA memcpy HtoD]
+359.48ms  603.42ms              (8 1 1)       (128 1 1)        48        0B        0B         -           -  GeForce GTX 750         1         7  getEnergySpec(double, double, double*, double*, double*, bool) [112]
+963.00ms  1.2291ms                    -               -         -         -         -  4.5700MB  3.6311GB/s  GeForce GTX 750         1         7  [CUDA memcpy DtoH]
+
+Regs: Number of registers used per CUDA thread. This number includes registers used internally by the CUDA driver and/or tools and can be more than what the compiler shows.
+SSMem: Static shared memory allocated per CUDA block.
+DSMem: Dynamic shared memory allocated per CUDA block.
