@@ -135,13 +135,13 @@ int main(void){
     bool triggEff = true;
     bool energyRes = true;
     double mass = 1.0;
-    double distance = 1.0;
-    double events = 160;
+    double distance = 5.0;
+    double events = 10;
     int filenumber;
     double noise = pow(10,-5);
 
     /*calculate uncertainty for certain configuration*/
-    for (filenumber=1; filenumber<1; filenumber++){ 
+    for (filenumber=1; filenumber<11; filenumber++){
         printf("evaluating file %d \n", filenumber);
         calcLLH(mass, distance, events, triggEff, energyRes, filenumber, noise);
     }
