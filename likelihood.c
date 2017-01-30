@@ -22,8 +22,8 @@ BINNING: see spectrum.h
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber){
 
     /*load events & store energy and time in arrays*/
-    char filename[sizeof "1eV_ideal/eventsGenerated_1.34eV_10.5Mpc_1000Events_ideal_1111.txt"];
-    sprintf(filename, filename, "%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
+    char filename[sizeof "DATA/10.00Mpc_700Events_1.57eV_event_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
+    sprintf(filename, "DATA/%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
 
     FILE *f = fopen(filename, "r");
     int i;

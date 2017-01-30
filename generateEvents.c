@@ -24,12 +24,12 @@ BINNING: defined in header-file (spectrum.h)
 void createEvents(user_data_t mass, user_data_t distance, user_data_t events, bool triggEff, bool energyRes, int filenumber, user_data_t *spectrum, user_data_t max){
 
     /* file for storing time & energy */
-    char filename[sizeof "10.00Mpc_700Events_1.57eV_event_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
+    char filename[sizeof "DATA/10.00Mpc_700Events_1.57eV_event_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
     if (triggEff && energyRes){
-        sprintf(filename, "%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
+        sprintf(filename, "DATA/%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
     }
     else {
-        sprintf(filename, "events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d_test.txt", mass, distance, events, filenumber);
+        sprintf(filename, "DATA/events_%.2feV_%.1fMpc_%.0fEvents_ideal_%d_test.txt", mass, distance, events, filenumber);
     }
     FILE *f = fopen(filename, "w");
     if (f == NULL){
@@ -69,8 +69,8 @@ int main(void){
     bool triggEff = true;
     bool energyRes = true;
     bool plot = false;
-    user_data_t mass = 13.0;
-    user_data_t distance = 4.0;
+    user_data_t mass = 1.5;
+    user_data_t distance = 5.0;
     user_data_t events = 10.0;
     user_data_t max;
     int filenumber, i;
@@ -99,11 +99,12 @@ int main(void){
     srand( (unsigned)time( NULL ) );
     /*create files that contain pseudo experiments*/
     // create directory
-    char dirname[sizeof "a10.00Mpc/700Events/1.57eV"];
-    sprintf(dirname, "%.2fMpc_%.0fEvents_%.2feV", distance, events, mass);
+    mkdir("DATA", S_IRWXU);
+    char dirname[sizeof "DATA/10.00Mpc_700Events_1.57eV"];
+    sprintf(dirname, "DATA/%.2fMpc_%.0fEvents_%.2feV", distance, events, mass);
     mkdir(dirname, S_IRWXU);
 
-    for (filenumber=1; filenumber<5; filenumber++){ 
+    for (filenumber=1; filenumber<1001; filenumber++){ 
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, triggEff, energyRes, filenumber, spectrum, max);
     }

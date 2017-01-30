@@ -5,7 +5,7 @@
 
 /*define size of the grid*/
 #define RESE 200
-#define REST 500
+#define REST 300
 #define EMAX 60.0
 #define TMAX 10.0
 #define STEPE EMAX/RESE
