@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 
+/*define size of the grid*/
 #define RESE 600
 #define REST 1000
 #define EMAX 60.0
@@ -17,7 +18,7 @@ typedef float user_data_t;
 typedef double user_data_t;
 #endif
 
-/* normalized LL energy spectrum - 15.4 average energy, 3.8: betha, 4802: normalization factor*/
+/* normalized LL energy spectrum - 15.4: average energy, 3.8: betha, 4802: normalization factor*/
 #define LL_energy_spectrum(E) pow(E, 3.8)*exp(-(1.0+3.8)*E/15.4)/4802.516160
 /* normalized LL arrival time spectrum - approximated by log-normal-dist */
 #define MY -1.0324
@@ -32,10 +33,9 @@ N is proportional to E -> N = 1/alpha*E -> N=alpha*E -> factor of alpha for sigm
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-user_data_t time_shift(user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
-user_data_t LLSpectrumTotal (user_data_t t, user_data_t E, user_data_t mass, user_data_t dist);
-void ProbFirstHitDist (user_data_t mass, user_data_t dist, user_data_t events, user_data_t *result);
-void correlation(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec);
 void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes);
+void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise);
+void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
+double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy);
 
 #endif
