@@ -22,8 +22,11 @@ typedef double user_data_t;
 #define MY -1.0324
 #define SIGMA 0.9134
 #define LL_time_spectrum(t) exp( - (log(t)-MY)*(log(t)-MY)/(2*SIGMA*SIGMA) ) / (t*SIGMA*sqrt(2*M_PI))
-/*gaussian (around 0): error for the energy smearing: sqrt(E) -> sigma2=E*/
-#define GAUSS(i, sigma2) 1/sqrt(2.0*M_PI*sigma2)*exp(-(i*i)/(2.0*sigma2))
+#define ALPHA 2.22
+/*gaussian (around 0): error for the energy smearing from photon counts:
+N is proportional to E -> N = 1/alpha*E -> N=alpha*E -> factor of alpha for sigma2 (sigma2=E)
+*/
+#define GAUSS(i, sigma2) 1/sqrt(2.0*M_PI*sigma2*ALPHA)*exp(-(i*i)/(2.0*sigma2*ALPHA))
 
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
