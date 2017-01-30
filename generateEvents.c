@@ -160,10 +160,12 @@ int main(void){
     srand( (unsigned)time( NULL ) );
 
     //calculate uncertainty for certain configuration
+    /*
     for (filenumber=1; filenumber<2; filenumber++){
         printf("creating file %d \n", filenumber);
         createEvents(mass, distance, events, useTriggerEff, useEnergyRes, filenumber, spectrum, max);
     }
+    */
 
     //free(spectrum);
     printf("DONE\n");

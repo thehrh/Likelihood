@@ -237,7 +237,7 @@ void getEnergySpec(user_data_t mass, user_data_t dist, user_data_t *timeArray, u
                 }
                 */
                 pNew = 0.0;
-                for (g=-RESE; g<RESE+1; g+=5){
+                for (g=-RESE; g<RESE+1; g+=2){
                     if (f-g >= 0 && f-g < RESE){
                         pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
 		            }
