@@ -283,8 +283,7 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     cudaMemcpy(d_timeArray, &timeArray, 1.3*REST*size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_triggerEffs, triggerEffs, (RESE+1)*size, cudaMemcpyHostToDevice);
 
-    getEnergySpec<<<(REST + 511) / 512, 512>>>(mass, dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
-    CudaCheckError();
+    getEnergySpec<<<(REST + THREADS_PER_BLOCK) / THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(mass, dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
 
     cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
 

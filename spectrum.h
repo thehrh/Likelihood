@@ -9,6 +9,7 @@
 #define TMAX 10.0
 #define STEPE EMAX/RESE
 #define STEPT TMAX/REST
+#define THREADS_PER_BLOCK 128
 
 #ifdef USE_SP
 typedef float user_data_t;
