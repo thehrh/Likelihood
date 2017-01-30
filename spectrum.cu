@@ -197,52 +197,49 @@ void normalize(user_data_t *distribution){
 
 
 __global__
-void getEnergySpec(user_data_t *mass, user_data_t *dist, user_data_t *timeArray, user_data_t *triggerEffs, user_data_t *distribution, bool useEnergyRes){
-    //TODO: solve memory issue with "distribution"
+void getEnergySpec(user_data_t mass, user_data_t dist, user_data_t *timeArray, user_data_t *triggerEffs, user_data_t *distribution, bool useEnergyRes){
     user_data_t time, pUnsmeared, pNew;
     int e, f, g, arrayIndex;
-
     int t = blockIdx.x*blockDim.x + threadIdx.x;
     if (t < REST){
         user_data_t energySpectrum[RESE];
         energySpectrum[0] = 0.0;
         for (e=1; e<RESE; e++){
             // make this explicit for now, until know how to call function correctly
-            time =  t*STEPT - (*dist)*51.4635*(*mass/(e*STEPE))*(*mass/(e*STEPE));//getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+            time =  t*STEPT - (dist)*51.4635*(mass/(e*STEPE))*(mass/(e*STEPE));//getTimeDelay(t*STEPT, e*STEPE, mass, dist);
+            //printf("time %.2f \n",time);
             arrayIndex = (int) (time/(STEPT) + 0.3*REST);
+            //printf("array index %d \n",arrayIndex);
             if (arrayIndex <= 0){
                 arrayIndex = 0;
-	    }
-	    pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
+	        }
+	        pUnsmeared = LL_energy_spectrum(e*STEPE)*timeArray[arrayIndex]*triggerEffs[e];
             if (!useEnergyRes){
                 distribution[t*(RESE-1) +e-1] = pUnsmeared;
             }
             energySpectrum[e] = pUnsmeared;
-	}
+	    }
         if (useEnergyRes){
             // also make this explicit for now
             // applyEnergyRes(t, distribution, energySpectrum);
             for (f=1; f<RESE; f+=1){
                 pNew = 0.0;
                 for (g=-RESE; g<RESE+1; g+=5){
-                    if (f-g >= 0 && f-g <= RESE){
+                    if (f-g >= 0 && f-g < RESE){
                         pNew += GAUSS(g*STEPE, f*STEPE)*energySpectrum[f-g];
-		    }
+		            }
                 }
                 distribution[t*(RESE-1)+f-1] = pNew*STEPE;
             }
-	}
+	    }
     }	
 }
 
 void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes){
-    user_data_t *d_timeArray;
     user_data_t timeArray[(int) (1.3*REST)];
-
-    user_data_t *d_mass, *d_dist, *d_triggerEffs, *d_distribution;
-    //bool *d_useEnergyRes;
+    //user_data_t *h_spec = (user_data_t*) malloc((RESE-1) * REST * sizeof(user_data_t));
+    user_data_t *d_mass, *d_dist, *d_triggerEffs, *d_distribution, *d_timeArray;
     int size = sizeof(user_data_t);
-    printf("now in generateDist");
     correlation(mass, dist, events, timeArray);
 
     //create a file from the timeArray for debugging
@@ -254,24 +251,25 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     }
     fclose(f);
 
-    cudaMalloc(&d_mass, size); cudaMalloc(&d_dist, size);
-    cudaMalloc(&d_distribution, (RESE-1) * REST * size);
-    cudaMalloc(&d_triggerEffs, RESE*size);
-    //cudaMalloc(&d_useEnergyRes, sizeof(bool));
-    cudaMalloc(&d_timeArray, 1.3*REST*size);
+    cudaError_t error;
 
-    cudaMemcpy(d_mass, &mass, size, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dist, &dist, size, cudaMemcpyHostToDevice);
+    cudaMalloc((void **)&d_distribution, (RESE-1) * REST * size);
+    cudaMalloc((void **)&d_triggerEffs, RESE*size);
+    cudaMalloc((void **)&d_timeArray, 1.3*REST*size);
+
     cudaMemcpy(d_timeArray, &timeArray, 1.3*REST*size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_triggerEffs, &triggerEffs, RESE*size, cudaMemcpyHostToDevice);
-    //cudaMemcpy(d_useEnergyRes, &useEnergyRes, sizeof(bool), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_distribution, &distribution, (RESE-1) * REST * size, cudaMemcpyHostToDevice);
 
-    getEnergySpec<<<(REST + 511) / 512,512>>>(d_mass, d_dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
-    //getEnergySpec<<<REST, 1>>>(d_mass, d_dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
-    //CudaCheckError();
+    getEnergySpec<<<(REST + 511) / 512,512>>>(mass, dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
+    CudaCheckError();
 
-    cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
+    error = cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
+
+    if (error != cudaSuccess)
+    {
+        printf("cudamemcpy d_distribution returned error %s (code %d), line(%d)\n", cudaGetErrorString(error), error, __LINE__);
+        exit(EXIT_FAILURE);
+    }
 
     //create a file from the dist before norm
     char filename2[sizeof "spec_before_norm_CUDA.txt"];
@@ -282,11 +280,8 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     }
     fclose(f2);
 
-
-    cudaFree(d_mass); cudaFree(d_dist); cudaFree(d_timeArray); cudaFree(d_distribution);
-    cudaFree(d_triggerEffs);// cudaFree(d_useEnergyRes);
+    cudaFree(d_timeArray); cudaFree(d_distribution);
+    cudaFree(d_triggerEffs);;
 
     normalize(distribution);
-    
-
 }
