@@ -103,6 +103,20 @@ void cumSumT(user_data_t *arrayToSum, user_data_t *cumulative){
     }
 }
 
+__global__ void cumSumTGPU(user_data_t *arrayToSum, user_data_t *cumulative){
+    /*calculate the cumulative sum of the arrival time distribution*/
+    int t = blockIdx.x*blockDim.x + threadIdx.x;
+    int l;
+    user_data_t cum;
+    if (t < REST){
+        cum = 0.0;
+        for (l = 0; l <= t; l++){
+	    cum += arrayToSum[l];
+        }
+        cumulative[t] = cum;
+   }
+}
+
 void firstHitDistWeightedArrivalTimeDist(user_data_t *arrivalTimeDist, user_data_t *cumulative, user_data_t events, user_data_t *result){
     int m;
     user_data_t count = 0.0;
@@ -112,6 +126,13 @@ void firstHitDistWeightedArrivalTimeDist(user_data_t *arrivalTimeDist, user_data
     }
     for (m = 0; m < REST; m++){
         result[m] = result[m]/count;
+    }
+}
+
+__global__ void firstHitDistWeightedArrivalTimeDistGPU(user_data_t *arrivalTimeDist, user_data_t *cumulative, user_data_t events, user_data_t *result){
+    int t = blockIdx.x*blockDim.x + threadIdx.x;
+    if (t < REST){
+        result[t] = arrivalTimeDist[t]*events*pow((1 - cumulative[t]), events-1);
     }
 }
 
@@ -164,6 +185,69 @@ and newSpec[1.3*REST-1] to 10s*/
 void correlation(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec){
     user_data_t hitDist[REST];
     ProbFirstHitDist(mass, dist, events, hitDist);
+    convolveHitDistWithLLTimeSpec(hitDist, newSpec);
+}
+
+/* calculate the probability to get the first hit after a certain amount of time */
+__global__ void ProbFirstHitDistGPU(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *totalArrivalTimeDist){
+    /*arrival time distribution of all the hits (for a certain mass) - project the E,t spectrum
+    on the t axis - t in 0.01 steps from 0 to 10 seconds*/
+    int t = blockIdx.x*blockDim.x + threadIdx.x;
+    user_data_t sum, delay;
+    user_data_t y, e;
+    if (t < REST){
+        /* set the sum to zero for each time bin */
+        sum = 0.0;
+        /*Integrate over the energy part for every time bin. We move in 0.01 MeV
+        steps up to 60 MeV. For each pair of time and energy, we compute the
+        product of time and energy PDF ("LLSpectrumTotal"), continually
+        incrementing the sum*/
+        for (e = 0.01; e < EMAX; e += 0.01) {
+	    delay = t*STEPT - dist*51.4635*(mass/e)*(mass/e);
+            if (delay <= 0.) y = 0.0;
+            else y = LL_time_spectrum(delay)*LL_energy_spectrum(e);
+/*            if (t==0){
+		printf("\n time: %.10f \n", delay);
+                printf("\n y: %.10f \n", y);
+              }
+*/
+            sum += y * 0.01;
+        }
+        totalArrivalTimeDist[t] = sum*STEPT;
+    }
+}
+
+
+void correlationGPU(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *newSpec){
+    user_data_t totalArrivalTimeDist[REST], hitDist[REST];
+    user_data_t *d_totalArrivalTimeDist, *d_hitDist, *d_cumulative;
+    int size = sizeof(user_data_t);
+    cudaMalloc((void **)&d_totalArrivalTimeDist, REST * size);
+
+    ProbFirstHitDistGPU<<< (REST + THREADS_PER_BLOCK)/THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(mass, dist, events, d_totalArrivalTimeDist);
+
+    cudaMemcpy(totalArrivalTimeDist, d_totalArrivalTimeDist, REST * size, cudaMemcpyDeviceToHost);
+
+    cudaMalloc((void **)&d_cumulative, REST * size);
+
+    cumSumTGPU<<< (REST + THREADS_PER_BLOCK)/THREADS_PER_BLOCK, THREADS_PER_BLOCK >>>(d_totalArrivalTimeDist, d_cumulative);
+
+    cudaMalloc((void **)&d_hitDist, REST * size);
+
+    firstHitDistWeightedArrivalTimeDistGPU<<< (REST + THREADS_PER_BLOCK)/THREADS_PER_BLOCK, THREADS_PER_BLOCK >>>(d_totalArrivalTimeDist, d_cumulative, events, d_hitDist);
+    // now we still need to sum all elements of d_hitDist and divide by the sum
+    cudaMemcpy(hitDist, d_hitDist, REST * size, cudaMemcpyDeviceToHost);
+
+    user_data_t count = 0.0;
+    int m;
+    for (m = 0; m < REST; m++){
+        count += hitDist[m];
+    }
+
+    for (m=0; m<REST; m++){
+        hitDist[m] = hitDist[m]/count;
+    }
+
     convolveHitDistWithLLTimeSpec(hitDist, newSpec);
 }
 
@@ -263,9 +347,9 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
     user_data_t *d_triggerEffs, *d_distribution, *d_timeArray;
     int size = sizeof(user_data_t);
 
-    correlation(mass, dist, events, timeArray);
+    correlationGPU(mass, dist, events, timeArray);
+    //correlation(mass, dist, events, timeArray);
 
-    /*
     //create a file from the timeArray for debugging
     char filename[sizeof "timeArray_CUDA.txt"];
     sprintf(filename, "timeArray_CUDA.txt");
@@ -274,7 +358,7 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
         fprintf(f, "%e\n", timeArray[i]);
     }
     fclose(f);
-    */
+
 
     cudaMalloc((void **)&d_distribution, (RESE-1) * REST * size);
     cudaMalloc((void **)&d_triggerEffs, (RESE+1)*size);

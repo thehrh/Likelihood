@@ -76,7 +76,7 @@ user_data_t findSpectrumMax(user_data_t *spectrum){
 int main(void){
     bool triggEff = true;
     bool energyRes = true;
-    bool plot = false;
+    bool plot = true;
     user_data_t mass = 1.0;
     user_data_t distance = 5.0;
     user_data_t events = 10.0;
@@ -108,6 +108,7 @@ int main(void){
 
     /*create files that contain pseudo experiments*/
     // create directory
+
     mkdir("DATA", S_IRWXU);
     char dirname[sizeof "DATA/10.00Mpc_700Events_1.57eV"];
     sprintf(dirname, "DATA/%.2fMpc_%.0fEvents_%.2feV", distance, events, mass);
