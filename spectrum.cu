@@ -132,7 +132,7 @@ void firstHitDistWeightedArrivalTimeDist(user_data_t *arrivalTimeDist, user_data
 __global__ void firstHitDistWeightedArrivalTimeDistGPU(user_data_t *arrivalTimeDist, user_data_t *cumulative, user_data_t events, user_data_t *result){
     int t = blockIdx.x*blockDim.x + threadIdx.x;
     if (t < REST){
-        result[t] = arrivalTimeDist[t]*events*pow((1 - cumulative[t]), events-1);
+        result[t] = arrivalTimeDist[t]*events*powf((1 - cumulative[t]), events-1);
     }
 }
 
