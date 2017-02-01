@@ -4,8 +4,8 @@
 #include <stdbool.h>
 
 /*define size of the grid*/
-#define RESE 600
-#define REST 1000
+#define RESE 200
+#define REST 300
 #define THREADS_PER_BLOCK 128
 
 #ifdef USE_SP
@@ -37,7 +37,7 @@ N is proportional to E -> N = 1/alpha*E -> N=alpha*E -> factor of alpha for sigm
 #ifndef SPECTRUM_H_
 #define SPECTRUM_H_
 
-void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes);
+extern "C"{void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes);}
 void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise);
 void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber);
 double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy);

@@ -342,6 +342,7 @@ void getEnergySpec(user_data_t mass, user_data_t dist, user_data_t *timeArray, u
     }	
 }
 
+extern "C" {
 void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_data_t *distribution, user_data_t *triggerEffs, bool useEnergyRes){
     user_data_t timeArray[(int) (1.3*REST)];
     user_data_t *d_triggerEffs, *d_distribution, *d_timeArray;
@@ -371,6 +372,7 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
 
     cudaMemcpy(distribution, d_distribution, (RESE-1) * REST * size, cudaMemcpyDeviceToHost);
 
+    //printf("%.10f", distribution[1000]);
     /*
     //create a file from the dist before norm
     char filename2[sizeof "spec_before_norm_CUDA.txt"];
@@ -388,37 +390,29 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
 
     normalize(distribution);
 }
+}
+
 
 void fillTriggerEff(user_data_t *triggerEffs, bool useTriggerEff){
-    /*Read in trigger efficiency based on the chosen resolution (eff. vs. energy).
+    /*Read in trigger efficiency.
      Note that the trigger efficiency file for the chosen resolution needs
-     to be located in the current directory.*/
+     to be located in the proper directory.*/
     int i;
-    user_data_t triggerEns[RESE+1]; // TODO: why do we need this at all?
+    user_data_t triggerEns[601];
     if(useTriggerEff){
         FILE *myFile;
-        if (RESE==600){
-            myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
-        }
-        else if (RESE==6000){
-            myFile = fopen("trigger_efficiency_10keV_steps.txt", "r");
-        }
-        else if (RESE==60000){
-            myFile = fopen("trigger_efficiency_1keV_steps.txt", "r");
-        }
-        else {
-            printf("Invalid grid size for the energy resolution.");
-        }
-        for (i = 0; i < RESE+1; i++) {
+        myFile = fopen("trigger_efficiency_100keV_steps.txt", "r");
+        for (i = 0; i < 601; i++) {
             fscanf(myFile, "%lf %lf", &triggerEns[i], &triggerEffs[i]);
         }
         fclose(myFile);
     }
     else{
-        /* initialize with 1s for ideal trigger efficiency */
-        for(i = 0; i < RESE+1 ; triggerEffs[i++] = 1.0);
+        /* initialize with 1s if trigger efficiency is not considered */
+        for(i = 0; i < 601 ; triggerEffs[i++] = 1.0);
     }
 }
+
 
 void addNoise(user_data_t *spectrum, user_data_t noise){
     int i;
@@ -429,9 +423,8 @@ void addNoise(user_data_t *spectrum, user_data_t noise){
     }
 }
 
-
 void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise){
-    user_data_t triggerEffs[RESE+1];
+    user_data_t triggerEffs[601];
 
     /*get trigger efficiencies as function of energy*/
     fillTriggerEff(triggerEffs, useTriggerEff);
