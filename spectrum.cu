@@ -362,11 +362,11 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
 
 
     cudaMalloc((void **)&d_distribution, (RESE-1) * REST * size);
-    cudaMalloc((void **)&d_triggerEffs, (RESE+1)*size);
+    cudaMalloc((void **)&d_triggerEffs, 601*size);
     cudaMalloc((void **)&d_timeArray, 1.3*REST*size);
 
     cudaMemcpy(d_timeArray, &timeArray, 1.3*REST*size, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_triggerEffs, triggerEffs, (RESE+1)*size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_triggerEffs, triggerEffs, 601*size, cudaMemcpyHostToDevice);
 
     getEnergySpec<<<(REST + THREADS_PER_BLOCK) / THREADS_PER_BLOCK, THREADS_PER_BLOCK>>>(mass, dist, d_timeArray, d_triggerEffs, d_distribution, useEnergyRes);
 
