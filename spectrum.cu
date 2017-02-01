@@ -297,7 +297,7 @@ void getEnergySpec(user_data_t mass, user_data_t dist, user_data_t *timeArray, u
 	        }
             p_E_LL = LL_energy_spectrum(e*STEPE);
             p_t_LL = timeArray[arrayIndex];
-            triggerEff = triggerEffs[e];
+            triggerEff = triggerEffs[(int) (e*STEPE*10)];
             /*
             if (t==0){
                 printf("\n LL energy spectrum entry %d: %.10f \n", e, p_E_LL);
