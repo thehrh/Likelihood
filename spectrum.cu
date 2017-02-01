@@ -437,3 +437,45 @@ void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distanc
 
 }
 
+
+/// load event
+extern "C" {
+void getEvent(int *eventEnergy, int *eventTime, double mass, double distance, double events, int filenumber){
+
+    /*load events & store energy and time in arrays*/
+    char filename[sizeof "DATA/10.00Mpc_700Events_1.57eV_event_1.45eV_10.5Mpc_1000Events_real_1111.txt"];
+    sprintf(filename, "DATA/%.2fMpc_%.0fEvents_%.2feV/events_%.2feV_%.2fMpc_%.0fEvents_real_%d.txt",distance, events, mass, mass, distance, events, filenumber);
+
+    FILE *f = fopen(filename, "r");
+    int i;
+    for(i = 0; i < events; eventEnergy[i++] = 1);
+    for(i = 0; i < events; eventTime[i++] = 1);
+    for (i = 0; i < events; i++){
+        fscanf(f, "%d %d", &eventEnergy[i], &eventTime[i]);
+    }
+}
+}
+
+
+///function that calculates likelihood - and will then be minimized in python
+extern "C" {
+double getLLH(double mass, double distance, double events, bool triggEff, bool energyRes, double noise, int *eventTime, int *eventEnergy){
+
+    double llh = 0.0;
+    int i;
+    user_data_t spectrum[(RESE-1)*REST];
+        //double *spectrum= (double*) malloc((RESE-1) * REST * sizeof(double));
+    createSpectrum(spectrum, mass, distance, events, energyRes, triggEff, noise);
+
+    for (i = 0; i < events; i++){
+        if (spectrum[eventTime[i]*(RESE-1)+eventEnergy[i]] < pow(10,-200)){
+            llh += -10000000;
+            printf("value of spectrum very small - check");
+        }
+        else llh += log(spectrum[eventTime[i]*(RESE-1)+eventEnergy[i]]);
+    }
+    llh*=-1;
+    return llh;
+}
+}
+
