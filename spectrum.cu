@@ -350,7 +350,7 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
 
     correlationGPU(mass, dist, events, timeArray);
     //correlation(mass, dist, events, timeArray);
-
+    /*
     //create a file from the timeArray for debugging
     char filename[sizeof "timeArray_CUDA.txt"];
     sprintf(filename, "timeArray_CUDA.txt");
@@ -359,7 +359,7 @@ void generateDist(user_data_t mass, user_data_t dist, user_data_t events, user_d
         fprintf(f, "%e\n", timeArray[i]);
     }
     fclose(f);
-
+    */
 
     cudaMalloc((void **)&d_distribution, (RESE-1) * REST * size);
     cudaMalloc((void **)&d_triggerEffs, 601*size);
@@ -423,6 +423,7 @@ void addNoise(user_data_t *spectrum, user_data_t noise){
     }
 }
 
+extern "C"{
 void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distance, user_data_t events, bool useEnergyRes, bool useTriggerEff, user_data_t noise){
     user_data_t triggerEffs[601];
 
@@ -435,6 +436,7 @@ void createSpectrum(user_data_t *spectrum, user_data_t mass, user_data_t distanc
     /*sprinkle with some noise*/
     addNoise(spectrum, noise);
 
+}
 }
 
 

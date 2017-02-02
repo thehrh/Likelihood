@@ -6,12 +6,14 @@ def get_funcs_to_expose():
 	func = dll.generateDist
 	func2 = dll.getEvent
 	func3 = dll.getLLH
+	func4 = dll.createSpectrum
 	func.argtypes = [c_double, c_double, c_double, POINTER(c_double), POINTER(c_double), c_bool]
 	func2.argtypes = [POINTER(c_int), POINTER(c_int), c_double, c_double, c_double, c_int]
 	func3.argtypes = [c_double, c_double, c_double, c_bool, c_bool, c_double, POINTER(c_int), POINTER(c_int)]
-	return func, func2, func3
+	func4.argtypes = [POINTER(c_double), c_double, c_double, c_double, c_bool, c_bool, c_double]
+	return func, func2, func3, func4
 
-__generateDist, __getEvent, __getLLH = get_funcs_to_expose()
+__generateDist, __getEvent, __getLLH, __createSpectrum = get_funcs_to_expose()
 
 def generateDist(mass, dist, nevts, distribution, triggerEffs, useEnergyRes):
 	distribution_p = distribution.ctypes.data_as(POINTER(c_double))
@@ -28,6 +30,10 @@ def getEvent(eventEnergy, eventTime, mass, distance, events, filenumber):
         eventTime_p = eventTime.ctypes.data_as(POINTER(c_int))
         eventEnergy_p = eventEnergy.ctypes.data_as(POINTER(c_int))
         __getEvent(eventEnergy_p, eventTime_p, mass, distance, events, filenumber)
+
+def createSpectrum(spectrum, mass, distance, events, useEenergyRes, useTriggerEff, noise):
+	spectrum_p = spectrum.ctypes.data_as(POINTER(c_double))
+	__createSpectrum(spectrum_p, mass, distance, events, useEenergyRes, useTriggerEff, noise)
 
 if __name__ == '__main__':
 	mass = 1.0
